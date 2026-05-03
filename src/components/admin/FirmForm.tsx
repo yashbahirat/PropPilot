@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { useTransition } from "react"
 import { z } from "zod"
-import { Firm } from "@prisma/client"
+import { Firm, FirmOffer } from "@prisma/client"
 import { useRouter } from "next/navigation"
 
 import { Button } from "@/components/ui/button"
@@ -22,6 +22,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Switch } from "@/components/ui/switch"
 import { saveFirm } from "@/app/(admin)/admin/firms/actions"
+import { OfferManagement } from "@/components/admin/OfferManagement"
 
 export const firmSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters." }),
@@ -45,8 +46,12 @@ export const firmSchema = z.object({
 
 type FirmFormValues = z.infer<typeof firmSchema>
 
+type FirmWithOffers = Firm & {
+  offers: FirmOffer[]
+}
+
 interface FirmFormProps {
-  initialData?: Firm | null
+  initialData?: FirmWithOffers | null
 }
 
 export function FirmForm({ initialData }: FirmFormProps) {
@@ -103,6 +108,9 @@ export function FirmForm({ initialData }: FirmFormProps) {
             <TabsTrigger value="general" className="data-[state=active]:bg-[#2A2A35] data-[state=active]:text-white">General</TabsTrigger>
             <TabsTrigger value="metrics" className="data-[state=active]:bg-[#2A2A35] data-[state=active]:text-white">Metrics</TabsTrigger>
             <TabsTrigger value="settings" className="data-[state=active]:bg-[#2A2A35] data-[state=active]:text-white">Settings</TabsTrigger>
+            {initialData && (
+              <TabsTrigger value="offers" className="data-[state=active]:bg-[#2A2A35] data-[state=active]:text-white">Offers</TabsTrigger>
+            )}
           </TabsList>
           
           <TabsContent value="general" className="space-y-4 mt-4">
@@ -335,6 +343,12 @@ export function FirmForm({ initialData }: FirmFormProps) {
               />
             </div>
           </TabsContent>
+
+          {initialData && (
+            <TabsContent value="offers" className="space-y-4 mt-4">
+              <OfferManagement firmId={initialData.id} offers={initialData.offers} />
+            </TabsContent>
+          )}
         </Tabs>
 
         <Button type="submit" disabled={isPending} className="bg-[#00D4AA] text-[#08080F] hover:bg-[#00D4AA]/90">

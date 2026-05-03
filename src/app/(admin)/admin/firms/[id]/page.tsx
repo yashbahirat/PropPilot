@@ -18,6 +18,7 @@ export default async function FirmEditPage({
   if (!isNew) {
     firm = await db.firm.findUnique({
       where: { id: params.id },
+      include: { offers: true },
     })
 
     if (!firm) {
