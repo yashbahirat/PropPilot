@@ -1,12 +1,376 @@
-// PropPilot Prisma Schema
-// Datasource only — full model definitions added by Plan 04
+// PropPilot Database Schema
+// 15 models for v1.0
 
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  provider = "postgresql"
+}
+
+// ─── Enums ───────────────────────────────────────────────────────────────
+
+enum ClaimStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum RewardTierName {
+  BRONZE
+  SILVER
+  GOLD
+  PLATINUM
+}
+
+enum DrawdownType {
+  BALANCE
+  EQUITY
+  TRAILING_BALANCE
+  TRAILING_EQUITY
+}
+
+enum EvaluationType {
+  ONE_STEP
+  TWO_STEP
+  THREE_STEP
+  INSTANT_FUNDING
+  FUNDED_DIRECT
+}
+
+enum FundingStyle {
+  CHALLENGE
+  INSTANT
+  FUNDED
+}
+
+// ─── User ────────────────────────────────────────────────────────────────
+
+model User {
+  id        String   @id @default(cuid())
+  clerkId   String   @unique
+  email     String   @unique
+  firstName String?
+  lastName  String?
+  imageUrl  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  rewardPoints    UserRewardPoints?
+  pointTxns       PointTransaction[]
+  purchaseClaims  PurchaseClaim[]
+  savedFirms      SavedFirm[]
+  reviews         Review[]
+  affiliateClicks AffiliateClick[]
+  copyEvents      CopyEvent[]
+
+  @@index([clerkId])
+  @@index([email])
+}
+
+// ─── Firm ────────────────────────────────────────────────────────────────
+
+model Firm {
+  id             String   @id @default(cuid())
+  slug           String   @unique
+  name           String
+  logoUrl        String?
+  description    String?
+  websiteUrl     String?
+  affiliateUrl   String?
+  isActive       Boolean  @default(true)
+  isFeatured     Boolean  @default(false)
+  isVerified     Boolean  @default(false)
+  lastVerifiedAt DateTime?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  maxAccountSize      Int?
+  minAccountSize      Int?
+  challengeFee        Decimal?       @db.Decimal(10, 2)
+  profitTarget        Float?
+  dailyLossLimit      Float?
+  maxDrawdown         Float?
+  drawdownType        DrawdownType?
+  evaluationType      EvaluationType?
+  fundingStyle        FundingStyle?
+  payoutSpeed         String?
+  profitSplit         Float?
+  minTradingDays      Int?
+  consistencyRule     Boolean        @default(false)
+  consistencyRuleNote String?
+  newsTrading         Boolean        @default(false)
+  weekendHolding      Boolean        @default(false)
+  eaAllowed           Boolean        @default(false)
+  scalingPlan         Boolean        @default(false)
+  platforms           String[]
+  ruleDifficultyScore Int?
+
+  offers          FirmOffer[]
+  affiliateClicks AffiliateClick[]
+  copyEvents      CopyEvent[]
+  purchaseClaims  PurchaseClaim[]
+  savedFirms      SavedFirm[]
+  reviews         Review[]
+  faqs            FAQ[]
+  stats           ComparisonStats?
+
+  @@index([slug])
+  @@index([isActive, isFeatured])
+  @@index([drawdownType])
+  @@index([evaluationType])
+}
+
+// ─── FirmOffer ────────────────────────────────────────────────────────────
+
+model FirmOffer {
+  id              String    @id @default(cuid())
+  firmId          String
+  code            String
+  discountPercent Float?
+  discountAmount  Decimal?  @db.Decimal(10, 2)
+  description     String?
+  isExclusive     Boolean   @default(false)
+  isActive        Boolean   @default(true)
+  affiliateUrl    String?
+  expiresAt       DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  firm            Firm       @relation(fields: [firmId], references: [id], onDelete: Cascade)
+  affiliateClicks AffiliateClick[]
+  copyEvents      CopyEvent[]
+  purchaseClaims  PurchaseClaim[]
+
+  @@index([firmId, isActive])
+  @@index([code])
+}
+
+// ─── AffiliateClick ──────────────────────────────────────────────────────
+
+model AffiliateClick {
+  id        String   @id @default(cuid())
+  firmId    String
+  offerId   String?
+  userId    String?
+  sessionId String?
+  referrer  String?
+  userAgent String?
+  ipHash    String?
+  createdAt DateTime @default(now())
+
+  firm      Firm       @relation(fields: [firmId], references: [id], onDelete: Cascade)
+  offer     FirmOffer? @relation(fields: [offerId], references: [id], onDelete: SetNull)
+  user      User?      @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([firmId, createdAt])
+  @@index([userId])
+  @@index([createdAt])
+}
+
+// ─── CopyEvent ───────────────────────────────────────────────────────────
+
+model CopyEvent {
+  id        String   @id @default(cuid())
+  firmId    String
+  offerId   String?
+  userId    String?
+  sessionId String?
+  createdAt DateTime @default(now())
+
+  firm      Firm       @relation(fields: [firmId], references: [id], onDelete: Cascade)
+  offer     FirmOffer? @relation(fields: [offerId], references: [id], onDelete: SetNull)
+  user      User?      @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([firmId, createdAt])
+  @@index([userId])
+}
+
+// ─── PurchaseClaim ────────────────────────────────────────────────────────
+
+model PurchaseClaim {
+  id              String      @id @default(cuid())
+  userId          String
+  firmId          String
+  offerId         String?
+  orderId         String?
+  purchaseEmail   String
+  amountPaid      Decimal     @db.Decimal(10, 2)
+  purchaseDate    DateTime
+  discountCode    String?
+  receiptUrl      String
+  status          ClaimStatus @default(PENDING)
+  rejectionReason String?
+  pointsAwarded   Int?
+  adminNotes      String?
+  reviewedAt      DateTime?
+  reviewedBy      String?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  user            User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  firm            Firm       @relation(fields: [firmId], references: [id], onDelete: Restrict)
+  offer           FirmOffer? @relation(fields: [offerId], references: [id], onDelete: SetNull)
+
+  @@index([userId, status])
+  @@index([firmId])
+  @@index([status, createdAt])
+}
+
+// ─── UserRewardPoints ─────────────────────────────────────────────────────
+
+model UserRewardPoints {
+  id        String         @id @default(cuid())
+  userId    String         @unique
+  balance   Int            @default(0)
+  tier      RewardTierName @default(BRONZE)
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+
+  user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([tier])
+}
+
+// ─── PointTransaction ─────────────────────────────────────────────────────
+
+model PointTransaction {
+  id          String   @id @default(cuid())
+  userId      String
+  points      Int
+  description String
+  claimId     String?
+  createdAt   DateTime @default(now())
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+}
+
+// ─── RewardTier ──────────────────────────────────────────────────────────
+
+model RewardTier {
+  id              String         @id @default(cuid())
+  name            RewardTierName @unique
+  minPoints       Int
+  maxPoints       Int?
+  pointsPerDollar Int            @default(1)
+  benefits        String[]
+  badgeColor      String?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  @@index([minPoints])
+}
+
+// ─── Review ───────────────────────────────────────────────────────────────
+
+model Review {
+  id         String   @id @default(cuid())
+  userId     String
+  firmId     String
+  rating     Int
+  title      String?
+  content    String
+  isApproved Boolean  @default(false)
+  isVerified Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  firm       Firm     @relation(fields: [firmId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, firmId])
+  @@index([firmId, isApproved])
+  @@index([userId])
+}
+
+// ─── GuidePost ────────────────────────────────────────────────────────────
+
+model GuidePost {
+  id          String    @id @default(cuid())
+  slug        String    @unique
+  title       String
+  excerpt     String?
+  content     String
+  category    String?
+  tags        String[]
+  isPublished Boolean   @default(false)
+  publishedAt DateTime?
+  authorName  String?
+  readingTime Int?
+  metaTitle   String?
+  metaDesc    String?
+  ogImage     String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([slug])
+  @@index([isPublished, publishedAt])
+  @@index([category])
+}
+
+// ─── FAQ ─────────────────────────────────────────────────────────────────
+
+model FAQ {
+  id        String   @id @default(cuid())
+  firmId    String?
+  question  String
+  answer    String
+  sortOrder Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  firm      Firm?    @relation(fields: [firmId], references: [id], onDelete: Cascade)
+
+  @@index([firmId, sortOrder])
+}
+
+// ─── AdminActionLog ───────────────────────────────────────────────────────
+
+model AdminActionLog {
+  id         String   @id @default(cuid())
+  adminId    String
+  action     String
+  targetType String
+  targetId   String
+  metadata   Json?
+  createdAt  DateTime @default(now())
+
+  @@index([adminId])
+  @@index([targetType, targetId])
+  @@index([createdAt])
+}
+
+// ─── SavedFirm ────────────────────────────────────────────────────────────
+
+model SavedFirm {
+  id        String   @id @default(cuid())
+  userId    String
+  firmId    String
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  firm      Firm     @relation(fields: [firmId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, firmId])
+  @@index([userId])
+}
+
+// ─── ComparisonStats ─────────────────────────────────────────────────────
+
+model ComparisonStats {
+  id        String   @id @default(cuid())
+  firmId    String   @unique
+  pageViews Int      @default(0)
+  weekViews Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  firm      Firm     @relation(fields: [firmId], references: [id], onDelete: Cascade)
+
+  @@index([firmId])
 }
