@@ -1,3 +1,5 @@
+import { AdminSidebar } from "@/components/layout/AdminSidebar"
+
 export default function AdminLayout({
   children,
 }: {
@@ -5,8 +7,8 @@ export default function AdminLayout({
 }) {
   return (
     <div className="min-h-screen flex" style={{ backgroundColor: '#0E0E1A' }}>
-      {/* Admin sidebar will be added in Phase 2 */}
-      <main id="main-content" className="flex-1 p-6 md:p-8">
+      <AdminSidebar />
+      <main id="main-content" className="flex-1 p-6 md:p-8 overflow-y-auto h-screen">
         {children}
       </main>
     </div>
