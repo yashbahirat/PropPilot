@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { X } from 'lucide-react'
-import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/nextjs'
+import { useAuth, SignInButton, UserButton } from '@clerk/nextjs'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useEffect } from 'react'
 
@@ -18,6 +18,7 @@ type MobileDrawerProps = {
 
 export function MobileDrawer({ open, onClose, navLinks, rewardPoints }: MobileDrawerProps) {
   const pathname = usePathname()
+  const { isSignedIn } = useAuth()
 
   // Close drawer on route change
   useEffect(() => {
@@ -69,7 +70,10 @@ export function MobileDrawer({ open, onClose, navLinks, rewardPoints }: MobileDr
             style={{ borderColor: 'rgba(255,255,255,0.08)' }}
           >
             {/* Drawer header */}
-            <div className="flex items-center justify-between p-5 border-b" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
+            <div
+              className="flex items-center justify-between p-5 border-b"
+              style={{ borderColor: 'rgba(255,255,255,0.06)' }}
+            >
               <span className="text-xl font-bold tracking-tight">
                 <span className="text-white">Prop</span>
                 <span style={{ color: '#00D4AA' }}>Pilot</span>
@@ -93,13 +97,10 @@ export function MobileDrawer({ open, onClose, navLinks, rewardPoints }: MobileDr
                     <li key={link.href}>
                       <Link
                         href={link.href}
-                        className={`flex items-center py-3 px-3 rounded-md text-base font-medium transition-colors duration-200 border-l-2 ${
-                          isActive
-                            ? 'border-l-[#00D4AA]'
-                            : 'border-transparent hover:border-[rgba(0,212,170,0.4)]'
-                        }`}
+                        className="flex items-center py-3 px-3 rounded-md text-base font-medium transition-colors duration-200 border-l-2"
                         style={{
                           color: isActive ? '#00D4AA' : '#CBD5E1',
+                          borderColor: isActive ? '#00D4AA' : 'transparent',
                         }}
                       >
                         {link.label}
@@ -111,8 +112,11 @@ export function MobileDrawer({ open, onClose, navLinks, rewardPoints }: MobileDr
             </nav>
 
             {/* Footer — auth actions */}
-            <div className="p-5 border-t" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
-              <SignedIn>
+            <div
+              className="p-5 border-t"
+              style={{ borderColor: 'rgba(255,255,255,0.06)' }}
+            >
+              {isSignedIn ? (
                 <div className="flex items-center justify-between">
                   {rewardPoints !== null && (
                     <Link
@@ -128,25 +132,25 @@ export function MobileDrawer({ open, onClose, navLinks, rewardPoints }: MobileDr
                     <UserButton />
                   </div>
                 </div>
-              </SignedIn>
-
-              <SignedOut>
-                <SignInButton mode="redirect">
-                  <button
-                    className="w-full flex items-center justify-center font-medium py-2.5 px-4 rounded-lg text-sm transition-all duration-200"
-                    style={{ backgroundColor: '#00D4AA', color: '#08080F' }}
+              ) : (
+                <>
+                  <SignInButton mode="redirect">
+                    <button
+                      className="w-full flex items-center justify-center font-medium py-2.5 px-4 rounded-lg text-sm transition-all duration-200"
+                      style={{ backgroundColor: '#00D4AA', color: '#08080F' }}
+                    >
+                      Sign In
+                    </button>
+                  </SignInButton>
+                  <Link
+                    href="/sign-up"
+                    className="mt-2 w-full flex items-center justify-center border font-medium py-2.5 px-4 rounded-lg text-sm transition-all duration-200"
+                    style={{ borderColor: 'rgba(0,212,170,0.3)', color: '#00D4AA' }}
                   >
-                    Sign In
-                  </button>
-                </SignInButton>
-                <Link
-                  href="/sign-up"
-                  className="mt-2 w-full flex items-center justify-center border font-medium py-2.5 px-4 rounded-lg text-sm transition-all duration-200"
-                  style={{ borderColor: 'rgba(0,212,170,0.3)', color: '#00D4AA' }}
-                >
-                  Get Started
-                </Link>
-              </SignedOut>
+                    Get Started
+                  </Link>
+                </>
+              )}
             </div>
           </motion.div>
         </>

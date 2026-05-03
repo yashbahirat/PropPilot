@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { SignedIn, SignedOut, SignInButton, UserButton, useUser } from '@clerk/nextjs'
+import { useAuth, SignInButton, UserButton, useUser } from '@clerk/nextjs'
 import { Menu } from 'lucide-react'
 import { useState } from 'react'
 import { MobileDrawer } from './MobileDrawer'
@@ -16,9 +16,10 @@ const navLinks = [
 export function Header() {
   const pathname = usePathname()
   const [drawerOpen, setDrawerOpen] = useState(false)
+  const { isSignedIn } = useAuth()
   const { user } = useUser()
 
-  // Reward points from Clerk publicMetadata — populated by webhook/dashboard in later phases
+  // Reward points from Clerk publicMetadata — populated in later phases
   const rewardPoints = (user?.publicMetadata?.rewardPoints as number | undefined) ?? null
 
   return (
@@ -45,9 +46,7 @@ export function Header() {
                     key={link.href}
                     href={link.href}
                     className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
-                      isActive
-                        ? 'text-white'
-                        : 'text-slate-400 hover:text-white'
+                      isActive ? 'text-white' : 'text-slate-400 hover:text-white'
                     }`}
                   >
                     {link.label}
@@ -58,28 +57,27 @@ export function Header() {
 
             {/* Right side actions */}
             <div className="flex items-center gap-3">
-              {/* Reward points pill — signed in only, desktop only */}
-              <SignedIn>
-                {rewardPoints !== null && (
-                  <Link
-                    href="/dashboard/rewards"
-                    className="hidden lg:flex items-center gap-1.5 glass-teal px-3 py-1.5 rounded-full text-xs font-semibold hover:brightness-110 transition-all duration-200"
-                    style={{ color: '#00D4AA' }}
-                    title={`${rewardPoints.toLocaleString()} PropPilot Points — View rewards`}
-                  >
-                    <span aria-hidden="true">⟐</span>
-                    <span>{rewardPoints.toLocaleString()} pts</span>
-                  </Link>
-                )}
-                <UserButton
-                  appearance={{
-                    elements: { avatarBox: 'w-8 h-8' },
-                  }}
-                />
-              </SignedIn>
-
-              {/* Sign in — signed out, desktop only */}
-              <SignedOut>
+              {isSignedIn ? (
+                <>
+                  {/* Reward points pill — desktop only */}
+                  {rewardPoints !== null && (
+                    <Link
+                      href="/dashboard/rewards"
+                      className="hidden lg:flex items-center gap-1.5 glass-teal px-3 py-1.5 rounded-full text-xs font-semibold hover:brightness-110 transition-all duration-200"
+                      style={{ color: '#00D4AA' }}
+                      title={`${rewardPoints.toLocaleString()} PropPilot Points`}
+                    >
+                      <span aria-hidden="true">⟐</span>
+                      <span>{rewardPoints.toLocaleString()} pts</span>
+                    </Link>
+                  )}
+                  <UserButton
+                    appearance={{
+                      elements: { avatarBox: 'w-8 h-8' },
+                    }}
+                  />
+                </>
+              ) : (
                 <SignInButton mode="redirect">
                   <button
                     className="hidden lg:flex items-center border px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200"
@@ -99,7 +97,7 @@ export function Header() {
                     Sign In
                   </button>
                 </SignInButton>
-              </SignedOut>
+              )}
 
               {/* Hamburger — mobile only */}
               <button

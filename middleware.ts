@@ -23,12 +23,8 @@ const isAdminRoute = createRouteMatcher([
 export default clerkMiddleware(async (auth, request) => {
   // Admin routes: require authentication AND admin role
   if (isAdminRoute(request)) {
-    const { userId, sessionClaims } = await auth()
-
-    if (!userId) {
-      const { redirectToSignIn } = await import('@clerk/nextjs/server')
-      return redirectToSignIn({ returnBackUrl: request.url })
-    }
+    // auth.protect() will redirect unauthenticated users to sign-in automatically
+    const { userId, sessionClaims } = await auth.protect()
 
     // Check admin role stored in Clerk publicMetadata
     const role = (sessionClaims?.metadata as { role?: string } | undefined)?.role
@@ -37,10 +33,12 @@ export default clerkMiddleware(async (auth, request) => {
     }
   }
 
-  // All non-public routes require authentication
+  // All non-public routes require authentication (auto-redirects to sign-in)
   if (!isPublicRoute(request)) {
     await auth.protect()
   }
+
+  return NextResponse.next()
 })
 
 export const config = {
