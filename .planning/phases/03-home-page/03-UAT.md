@@ -1,9 +1,9 @@
 ---
-status: complete
+status: diagnosed
 phase: 03-home-page
 source: [03-01-SUMMARY.md, 03-02-SUMMARY.md, 03-03-SUMMARY.md]
 started: 2026-05-09T07:31:00Z
-updated: 2026-05-09T07:39:00Z
+updated: 2026-05-09T07:40:00Z
 ---
 
 ## Current Test
@@ -62,37 +62,52 @@ skipped: 0
   reason: "User reported: website takes time to load"
   severity: minor
   test: 1
+  root_cause: "Next.js dev server port conflict (zombie process holding port 3000/3001)"
   artifacts: []
-  missing: []
+  missing:
+    - "Kill all Node.js/Next.js processes holding ports"
+    - "Restart server cleanly"
 
 - truth: "The Featured Deals section displays a horizontal, snap-scroll carousel of firm offers with subtle entrance animations."
   status: failed
   reason: "User reported: website doesnt load correctlh"
   severity: major
   test: 2
+  root_cause: "Next.js dev server port conflict (zombie process holding port 3000/3001)"
   artifacts: []
-  missing: []
+  missing:
+    - "Kill all Node.js/Next.js processes holding ports"
+    - "Restart server cleanly"
 
 - truth: "The verified Savings section displays a responsive grid of firm offers. Hovering over a card produces a subtle glow/elevation effect."
   status: failed
   reason: "User reported: website doesnt load"
   severity: blocker
   test: 3
+  root_cause: "Next.js dev server port conflict (zombie process holding port 3000/3001)"
   artifacts: []
-  missing: []
+  missing:
+    - "Kill all Node.js/Next.js processes holding ports"
+    - "Restart server cleanly"
 
 - truth: "The Trust Metrics section displays animated counters (e.g., Verified Deals, Active Traders) with icons. Below it, the Social Proof section displays a glass-card highlighting the PropPilot Points program."
   status: failed
   reason: "User reported: again website issues"
   severity: major
   test: 4
+  root_cause: "Next.js dev server port conflict (zombie process holding port 3000/3001)"
   artifacts: []
-  missing: []
+  missing:
+    - "Kill all Node.js/Next.js processes holding ports"
+    - "Restart server cleanly"
 
 - truth: "The FAQ section displays a list of questions. Clicking a question expands an accordion to reveal the answer."
   status: failed
   reason: "User reported: website doesnt load"
   severity: blocker
   test: 5
+  root_cause: "Next.js dev server port conflict (zombie process holding port 3000/3001)"
   artifacts: []
-  missing: []
+  missing:
+    - "Kill all Node.js/Next.js processes holding ports"
+    - "Restart server cleanly"
