@@ -2,21 +2,21 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_phase: 2
-status: executing
-last_updated: "2026-05-03T18:59:11.904Z"
+current_phase: 4
+status: planning
+last_updated: "2026-05-09T07:29:23.311Z"
 progress:
   total_phases: 12
-  completed_phases: 1
-  total_plans: 16
-  completed_plans: 7
-  percent: 44
+  completed_phases: 2
+  total_plans: 19
+  completed_plans: 10
+  percent: 53
 ---
 
 # State: PropPilot
 
-**Status:** Executing Phase 2
-**Current Phase:** 2
+**Status:** Ready to plan
+**Current Phase:** 4
 **Last Updated:** 2026-05-03
 
 ## Project Reference
@@ -24,7 +24,7 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-03)
 
 **Core value:** Traders can find the best prop firm, claim the best discount, and trust the information is accurate — all in one premium experience.
-**Current focus:** Phase 2 — admin-firm-offer-management
+**Current focus:** Phase 03 — home-page
 
 ## Phase Progress
 
