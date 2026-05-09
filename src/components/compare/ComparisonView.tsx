@@ -257,7 +257,7 @@ export function ComparisonView({ firms }: ComparisonViewProps) {
 
             {/* Values per firm */}
             {firms.map((firm, fi) => {
-              const val = values[fi];
+              const val = values[fi] ?? '—';
               const cellClass = getCellClass(val, values, spec);
 
               return (

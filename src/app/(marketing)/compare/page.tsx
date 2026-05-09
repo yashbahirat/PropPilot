@@ -1,5 +1,6 @@
 export const runtime = 'nodejs';
 
+import { Suspense } from 'react';
 import { Metadata } from 'next';
 import { db } from '@/lib/db';
 import { computeFirmScore, ScoredFirm } from '@/lib/scoring';
@@ -52,5 +53,15 @@ async function getFirmsWithScores(): Promise<ScoredFirm[]> {
 
 export default async function ComparePage() {
   const firms = await getFirmsWithScores();
-  return <ComparePageClient firms={firms} />;
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-[#08080F] flex items-center justify-center">
+          <div className="text-white/40 text-sm animate-pulse">Loading firms…</div>
+        </div>
+      }
+    >
+      <ComparePageClient firms={firms} />
+    </Suspense>
+  );
 }
