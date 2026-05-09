@@ -12,11 +12,10 @@ Traders should be able to find the best prop firm for their needs, claim the bes
 
 ### Validated
 
-(None yet — ship to validate)
+- [x] Home page with premium hero, firm search, featured deals, trust metrics, and social proof (Validated in Phase 03)
 
 ### Active
 
-- [ ] Home page with premium hero, firm search, featured deals, trust metrics, and social proof
 - [ ] Comparison page with filterable/sortable firm grid and side-by-side compare (up to 3)
 - [ ] Firm detail page with rules, pricing, payouts, pros/cons, reviews, FAQs, and discount CTA
 - [ ] Guides / Education section with SEO-friendly article cards and clean reading experience
@@ -87,4 +86,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-03 after initialization*
+*Last updated: 2026-05-09 after phase 03 completion*
