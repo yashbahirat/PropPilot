@@ -1,7 +1,7 @@
 "use server"
 
 import { db } from "@/lib/db"
-import { guideSchema } from "@/components/admin/GuideForm"
+import { guideSchema } from "@/lib/schemas"
 import { z } from "zod"
 import { revalidatePath } from "next/cache"
 import { auth } from "@clerk/nextjs/server"

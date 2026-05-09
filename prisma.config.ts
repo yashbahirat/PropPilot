@@ -1,5 +1,6 @@
 // PropPilot Prisma Configuration (Prisma 7)
 // Connection URLs live here, not in schema.prisma
+import "dotenv/config"
 import { defineConfig } from "prisma/config"
 
 export default defineConfig({

@@ -5,19 +5,21 @@ import { ArrowLeft } from "lucide-react"
 import Link from "next/link"
 
 export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
 
 export default async function GuideEditPage({
   params,
 }: {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }) {
-  const isNew = params.id === "new"
+  const { id } = await params
+  const isNew = id === "new"
   
   let guide = null
 
   if (!isNew) {
     guide = await db.guidePost.findUnique({
-      where: { id: params.id },
+      where: { id },
     })
 
     if (!guide) {

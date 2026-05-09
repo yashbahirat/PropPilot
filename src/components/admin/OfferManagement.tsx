@@ -2,9 +2,10 @@
 
 import { useState, useTransition } from "react"
 import { z } from "zod"
+import { offerSchema } from "@/lib/schemas"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
-import { FirmOffer } from "@prisma/client"
+import type { FirmOffer } from "@prisma/client"
 import { useRouter } from "next/navigation"
 import { Trash2, Plus } from "lucide-react"
 
@@ -29,15 +30,6 @@ import {
 } from "@/components/ui/table"
 import { saveOffer, deleteOffer } from "@/app/(admin)/admin/firms/actions"
 
-export const offerSchema = z.object({
-  code: z.string().min(1, "Code is required"),
-  discountPercent: z.coerce.number().optional().nullable(),
-  discountAmount: z.coerce.number().optional().nullable(),
-  description: z.string().optional().or(z.literal("")),
-  affiliateUrl: z.string().url("Valid URL required").optional().or(z.literal("")),
-  isExclusive: z.boolean().default(false),
-  isActive: z.boolean().default(true),
-})
 
 type OfferFormValues = z.infer<typeof offerSchema>
 

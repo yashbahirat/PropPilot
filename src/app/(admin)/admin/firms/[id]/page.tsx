@@ -5,25 +5,30 @@ import { ArrowLeft } from "lucide-react"
 import Link from "next/link"
 
 export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
 
 export default async function FirmEditPage({
   params,
 }: {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }) {
-  const isNew = params.id === "new"
+  const { id } = await params
+  const isNew = id === "new"
   
   let firm = null
 
   if (!isNew) {
-    firm = await db.firm.findUnique({
-      where: { id: params.id },
+    const rawFirm = await db.firm.findUnique({
+      where: { id },
       include: { offers: true },
     })
 
-    if (!firm) {
+    if (!rawFirm) {
       notFound()
     }
+    
+    // Serialize Prisma types (Decimals, Dates) to plain JS objects
+    firm = JSON.parse(JSON.stringify(rawFirm))
   }
 
   return (

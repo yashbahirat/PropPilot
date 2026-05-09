@@ -1,16 +1,19 @@
 import { db } from "@/lib/db"
 import { FirmTable } from "@/components/admin/FirmTable"
-import { columns } from "@/components/admin/columns"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { Plus } from "lucide-react"
 
 export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
 
 export default async function FirmsAdminPage() {
-  const firms = await db.firm.findMany({
+  const firmsRaw = await db.firm.findMany({
     orderBy: { createdAt: 'desc' }
   })
+  
+  // Serialize Prisma types (Decimals, Dates) to plain JS objects
+  const firms = JSON.parse(JSON.stringify(firmsRaw))
 
   return (
     <div className="space-y-6">
@@ -27,7 +30,7 @@ export default async function FirmsAdminPage() {
         </Button>
       </div>
 
-      <FirmTable columns={columns} data={firms} />
+      <FirmTable data={firms} />
     </div>
   )
 }

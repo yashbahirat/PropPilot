@@ -1,7 +1,7 @@
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table"
-import { Firm } from "@prisma/client"
+import type { Firm } from "@prisma/client"
 import { MoreHorizontal } from "lucide-react"
 import Link from "next/link"
 

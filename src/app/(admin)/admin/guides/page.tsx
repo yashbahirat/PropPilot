@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/table"
 
 export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
 
 export default async function GuidesAdminPage() {
   const guides = await db.guidePost.findMany({

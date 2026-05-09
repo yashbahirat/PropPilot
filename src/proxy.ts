@@ -1,4 +1,4 @@
-import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
+import { clerkClient, clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
 import { NextResponse } from 'next/server'
 
 // Public routes — accessible without authentication
@@ -24,10 +24,14 @@ export default clerkMiddleware(async (auth, request) => {
   // Admin routes: require authentication AND admin role
   if (isAdminRoute(request)) {
     // auth.protect() will redirect unauthenticated users to sign-in automatically
-    const { userId, sessionClaims } = await auth.protect()
+    const { userId } = await auth.protect()
 
-    // Check admin role stored in Clerk publicMetadata
-    const role = (sessionClaims?.metadata as { role?: string } | undefined)?.role
+    // Fetch user directly — publicMetadata is NOT in session claims by default
+    // (requires a custom JWT template in Clerk Dashboard to be in sessionClaims)
+    const client = await clerkClient()
+    const user = await client.users.getUser(userId)
+    const role = user.publicMetadata?.role as string | undefined
+
     if (role !== 'admin') {
       return NextResponse.redirect(new URL('/', request.url))
     }

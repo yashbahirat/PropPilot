@@ -1,8 +1,7 @@
 import { PrismaClient } from '@prisma/client'
 import { PrismaNeon } from '@prisma/adapter-neon'
-
-// Prisma 7 + Neon: use the Neon adapter with a PoolConfig
-// PrismaNeon accepts a PoolConfig (connection config), not a Pool instance
+import { Pool } from 'pg'
+import { PrismaPg } from '@prisma/adapter-pg'
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined
@@ -13,14 +12,22 @@ function createPrismaClient(): PrismaClient {
     throw new Error('DATABASE_URL is not set')
   }
 
-  const adapter = new PrismaNeon({ connectionString: process.env.DATABASE_URL })
+  // Only use Neon adapter if connecting to Neon database
+  if (process.env.DATABASE_URL.includes('neon.tech')) {
+    const adapter = new PrismaNeon({ connectionString: process.env.DATABASE_URL })
+    return new PrismaClient({
+      adapter,
+      log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
+    })
+  }
 
+  // Use pg adapter for local database since Prisma requires an adapter in this build
+  const pool = new Pool({ connectionString: process.env.DATABASE_URL })
+  const adapter = new PrismaPg(pool)
+  
   return new PrismaClient({
     adapter,
-    log:
-      process.env.NODE_ENV === 'development'
-        ? ['query', 'error', 'warn']
-        : ['error'],
+    log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
   })
 }
 

@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/table"
 
 export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
 
 export default async function ReviewsAdminPage() {
   const reviews = await db.review.findMany({

@@ -4,7 +4,8 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { useTransition } from "react"
 import { z } from "zod"
-import { Firm, FirmOffer } from "@prisma/client"
+import { firmSchema } from "@/lib/schemas"
+import type { Firm, FirmOffer } from "@prisma/client"
 import { useRouter } from "next/navigation"
 
 import { Button } from "@/components/ui/button"
@@ -24,25 +25,6 @@ import { Switch } from "@/components/ui/switch"
 import { saveFirm } from "@/app/(admin)/admin/firms/actions"
 import { OfferManagement } from "@/components/admin/OfferManagement"
 
-export const firmSchema = z.object({
-  name: z.string().min(2, { message: "Name must be at least 2 characters." }),
-  slug: z.string().min(2, { message: "Slug must be at least 2 characters." }),
-  logoUrl: z.string().url({ message: "Please enter a valid URL." }).optional().or(z.literal("")),
-  description: z.string().optional().or(z.literal("")),
-  websiteUrl: z.string().url({ message: "Please enter a valid URL." }).optional().or(z.literal("")),
-  affiliateUrl: z.string().url({ message: "Please enter a valid URL." }).optional().or(z.literal("")),
-  
-  minAccountSize: z.coerce.number().optional().nullable(),
-  maxAccountSize: z.coerce.number().optional().nullable(),
-  challengeFee: z.coerce.number().optional().nullable(),
-  profitTarget: z.coerce.number().optional().nullable(),
-  dailyLossLimit: z.coerce.number().optional().nullable(),
-  maxDrawdown: z.coerce.number().optional().nullable(),
-  
-  isActive: z.boolean().default(true),
-  isFeatured: z.boolean().default(false),
-  isVerified: z.boolean().default(false),
-})
 
 type FirmFormValues = z.infer<typeof firmSchema>
 
@@ -60,19 +42,29 @@ export function FirmForm({ initialData }: FirmFormProps) {
 
   const defaultValues: Partial<FirmFormValues> = initialData
     ? {
-        ...initialData,
-        logoUrl: initialData.logoUrl || "",
-        description: initialData.description || "",
-        websiteUrl: initialData.websiteUrl || "",
-        affiliateUrl: initialData.affiliateUrl || "",
-        minAccountSize: initialData.minAccountSize || undefined,
-        maxAccountSize: initialData.maxAccountSize || undefined,
+        name: initialData.name ?? "",
+        slug: initialData.slug ?? "",
+        logoUrl: initialData.logoUrl ?? "",
+        description: initialData.description ?? "",
+        websiteUrl: initialData.websiteUrl ?? "",
+        affiliateUrl: initialData.affiliateUrl ?? "",
+        isActive: initialData.isActive,
+        isFeatured: initialData.isFeatured,
+        isVerified: initialData.isVerified,
+        minAccountSize: initialData.minAccountSize ?? undefined,
+        maxAccountSize: initialData.maxAccountSize ?? undefined,
         challengeFee: initialData.challengeFee ? Number(initialData.challengeFee) : undefined,
-        profitTarget: initialData.profitTarget || undefined,
-        dailyLossLimit: initialData.dailyLossLimit || undefined,
-        maxDrawdown: initialData.maxDrawdown || undefined,
+        profitTarget: initialData.profitTarget ?? undefined,
+        dailyLossLimit: initialData.dailyLossLimit ?? undefined,
+        maxDrawdown: initialData.maxDrawdown ?? undefined,
       }
     : {
+        name: "",
+        slug: "",
+        logoUrl: "",
+        description: "",
+        websiteUrl: "",
+        affiliateUrl: "",
         isActive: true,
         isFeatured: false,
         isVerified: false,
@@ -102,17 +94,23 @@ export function FirmForm({ initialData }: FirmFormProps) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        <Tabs defaultValue="general" className="w-full">
-          <TabsList className="bg-[#1A1A24] border-[#2A2A35]">
-            <TabsTrigger value="general" className="data-[state=active]:bg-[#2A2A35] data-[state=active]:text-white">General</TabsTrigger>
-            <TabsTrigger value="metrics" className="data-[state=active]:bg-[#2A2A35] data-[state=active]:text-white">Metrics</TabsTrigger>
-            <TabsTrigger value="settings" className="data-[state=active]:bg-[#2A2A35] data-[state=active]:text-white">Settings</TabsTrigger>
-            {initialData && (
-              <TabsTrigger value="offers" className="data-[state=active]:bg-[#2A2A35] data-[state=active]:text-white">Offers</TabsTrigger>
-            )}
-          </TabsList>
-          
+      {/*
+        Tabs must be the outer wrapper so all TabsContent (including Offers) share
+        the same Tabs context. The HTML <form> only wraps General/Metrics/Settings
+        to avoid nested <form> elements (invalid HTML + hydration error).
+      */}
+      <Tabs defaultValue="general" className="w-full space-y-8">
+        <TabsList className="bg-[#1A1A24] border-[#2A2A35]">
+          <TabsTrigger value="general" className="data-[state=active]:bg-[#2A2A35] data-[state=active]:text-white">General</TabsTrigger>
+          <TabsTrigger value="metrics" className="data-[state=active]:bg-[#2A2A35] data-[state=active]:text-white">Metrics</TabsTrigger>
+          <TabsTrigger value="settings" className="data-[state=active]:bg-[#2A2A35] data-[state=active]:text-white">Settings</TabsTrigger>
+          {initialData && (
+            <TabsTrigger value="offers" className="data-[state=active]:bg-[#2A2A35] data-[state=active]:text-white">Offers</TabsTrigger>
+          )}
+        </TabsList>
+
+        {/* ── Firm fields form (General / Metrics / Settings + Save) ── */}
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           <TabsContent value="general" className="space-y-4 mt-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
@@ -197,7 +195,7 @@ export function FirmForm({ initialData }: FirmFormProps) {
           </TabsContent>
 
           <TabsContent value="metrics" className="space-y-4 mt-4">
-             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
                 name="minAccountSize"
@@ -276,7 +274,7 @@ export function FirmForm({ initialData }: FirmFormProps) {
                   </FormItem>
                 )}
               />
-             </div>
+            </div>
           </TabsContent>
 
           <TabsContent value="settings" className="space-y-4 mt-4">
@@ -344,17 +342,18 @@ export function FirmForm({ initialData }: FirmFormProps) {
             </div>
           </TabsContent>
 
-          {initialData && (
-            <TabsContent value="offers" className="space-y-4 mt-4">
-              <OfferManagement firmId={initialData.id} offers={initialData.offers} />
-            </TabsContent>
-          )}
-        </Tabs>
+          <Button type="submit" disabled={isPending} className="bg-[#00D4AA] text-[#08080F] hover:bg-[#00D4AA]/90">
+            {isPending ? "Saving..." : "Save Changes"}
+          </Button>
+        </form>
 
-        <Button type="submit" disabled={isPending} className="bg-[#00D4AA] text-[#08080F] hover:bg-[#00D4AA]/90">
-          {isPending ? "Saving..." : "Save Changes"}
-        </Button>
-      </form>
+        {/* ── Offers tab — has its own form, must live outside the firm <form> ── */}
+        {initialData && (
+          <TabsContent value="offers" className="space-y-4 mt-4">
+            <OfferManagement firmId={initialData.id} offers={initialData.offers} />
+          </TabsContent>
+        )}
+      </Tabs>
     </Form>
   )
 }

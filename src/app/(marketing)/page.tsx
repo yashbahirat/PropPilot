@@ -1,4 +1,10 @@
 import type { Metadata } from 'next'
+import { Hero } from '@/components/home/Hero'
+import { FeaturedDeals } from '@/components/home/FeaturedDeals'
+import { SavingsCards } from '@/components/home/SavingsCards'
+import { TrustMetrics } from '@/components/home/TrustMetrics'
+import { SocialProof } from '@/components/home/SocialProof'
+import { HomeFAQ } from '@/components/home/HomeFAQ'
 
 export const metadata: Metadata = {
   title: 'PropPilot — Compare Prop Firms & Earn Rewards',
@@ -8,16 +14,15 @@ export const metadata: Metadata = {
 
 export default function HomePage() {
   return (
-    <div className="min-h-[70vh] flex items-center justify-center px-4">
-      <div className="text-center">
-        <h1 className="gradient-text-teal text-5xl md:text-7xl font-bold mb-4 tracking-tight">
-          PropPilot
-        </h1>
-        <p className="text-slate-400 text-xl mb-2">Compare. Save. Trade.</p>
-        <p className="text-slate-600 text-sm">
-          Full home page coming in Phase 3 — foundation is live ✓
-        </p>
-      </div>
+    <div className="flex flex-col min-h-screen">
+      <Hero />
+      <FeaturedDeals />
+      <SavingsCards />
+      <TrustMetrics />
+      <SocialProof />
+      <HomeFAQ />
     </div>
   )
 }
+
+

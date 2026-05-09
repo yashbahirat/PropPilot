@@ -16,15 +16,16 @@ import {
   TableRow,
 } from "@/components/ui/table"
 
-interface FirmTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[]
-  data: TData[]
+import { columns } from "./columns"
+import type { Firm } from "@prisma/client"
+
+interface FirmTableProps {
+  data: Firm[]
 }
 
-export function FirmTable<TData, TValue>({
-  columns,
+export function FirmTable({
   data,
-}: FirmTableProps<TData, TValue>) {
+}: FirmTableProps) {
   const table = useReactTable({
     data,
     columns,

@@ -4,7 +4,8 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { useTransition } from "react"
 import { z } from "zod"
-import { GuidePost } from "@prisma/client"
+import { guideSchema } from "@/lib/schemas"
+import type { GuidePost } from "@prisma/client"
 import { useRouter } from "next/navigation"
 
 import { Button } from "@/components/ui/button"
@@ -22,15 +23,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
 import { saveGuide } from "@/app/(admin)/admin/guides/actions"
 
-export const guideSchema = z.object({
-  title: z.string().min(2, { message: "Title must be at least 2 characters." }),
-  slug: z.string().min(2, { message: "Slug must be at least 2 characters." }),
-  excerpt: z.string().optional().or(z.literal("")),
-  content: z.string().min(10, { message: "Content must be at least 10 characters." }),
-  category: z.string().optional().or(z.literal("")),
-  authorName: z.string().optional().or(z.literal("")),
-  isPublished: z.boolean().default(false),
-})
+
 
 type GuideFormValues = z.infer<typeof guideSchema>
 
@@ -53,6 +46,12 @@ export function GuideForm({ initialData }: GuideFormProps) {
         isPublished: initialData.isPublished,
       }
     : {
+        title: "",
+        slug: "",
+        excerpt: "",
+        content: "",
+        category: "",
+        authorName: "",
         isPublished: false,
       }
 
