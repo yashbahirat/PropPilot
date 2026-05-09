@@ -1,5 +1,5 @@
 ---
-status: complete
+status: diagnosed
 phase: 03-home-page
 source: [03-01-SUMMARY.md, 03-02-SUMMARY.md, 03-03-SUMMARY.md]
 started: 2026-05-09T07:43:00Z
@@ -58,21 +58,30 @@ skipped: 0
   reason: "User reported: pass but it doesnt scroll"
   severity: major
   test: 2
+  root_cause: "Missing Framer Motion drag props for desktop swiping, and not enough items to naturally overflow on wide screens."
   artifacts: []
-  missing: []
+  missing:
+    - "Add drag='x' and dragConstraints to FeaturedDeals carousel"
+    - "Ensure sufficient width or items to enable scrolling"
 
 - truth: "The Trust Metrics section displays animated counters (e.g., Verified Deals, Active Traders) with icons. Below it, the Social Proof section displays a glass-card highlighting the PropPilot Points program."
   status: failed
   reason: "User reported: the counters are not animated"
   severity: minor
   test: 4
+  root_cause: "Counter values are hardcoded text instead of using Framer Motion useMotionValue and animate."
   artifacts: []
-  missing: []
+  missing:
+    - "Implement an animated counter component using Framer Motion"
+    - "Animate numbers from 0 to their target values when in view"
 
 - truth: "The FAQ section displays a list of questions. Clicking a question expands an accordion to reveal the answer."
   status: failed
   reason: "User reported: yes it expands but the animation is not smooth"
   severity: minor
   test: 5
+  root_cause: "globals.css is missing accordion-up and accordion-down keyframes/animations required by shadcn/ui in Tailwind 4."
   artifacts: []
-  missing: []
+  missing:
+    - "Add accordion keyframes to globals.css @theme"
+    - "Add accordion animation variables to globals.css @theme"
