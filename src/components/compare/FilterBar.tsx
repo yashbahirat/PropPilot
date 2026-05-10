@@ -33,7 +33,7 @@ interface FilterChipProps {
   label: string;
   activeValue?: string;
   onClear: () => void;
-  children: React.ReactNode;
+  children: (close: () => void) => React.ReactNode;
 }
 
 function FilterChip({ label, activeValue, onClear, children }: FilterChipProps) {
@@ -81,7 +81,7 @@ function FilterChip({ label, activeValue, onClear, children }: FilterChipProps) 
 
       {open && (
         <div className="absolute top-full left-0 mt-2 z-50 min-w-[190px] rounded-xl border border-white/10 bg-[#0E0E1A] shadow-2xl shadow-black/50 p-2">
-          {children}
+          {children(() => setOpen(false))}
         </div>
       )}
     </div>
@@ -158,7 +158,7 @@ export function FilterBar() {
 
   return (
     <div className="sticky top-16 z-40 bg-[#08080F]/95 backdrop-blur border-b border-white/5 py-3 px-4">
-      <div className="max-w-7xl mx-auto flex items-center gap-2 overflow-x-auto scrollbar-hide">
+      <div className="max-w-7xl mx-auto flex items-center gap-2 flex-wrap">
         {/* Drawdown Type */}
         <FilterChip
           label="Drawdown"
@@ -167,14 +167,21 @@ export function FilterBar() {
           }
           onClear={() => clearFilter('drawdownType')}
         >
-          {Object.entries(DRAWDOWN_LABELS).map(([value, label]) => (
-            <OptionButton
-              key={value}
-              label={label}
-              selected={params.drawdownType === value}
-              onClick={() => setParams({ drawdownType: value as typeof params.drawdownType })}
-            />
-          ))}
+          {(close) => (
+            <>
+              {Object.entries(DRAWDOWN_LABELS).map(([value, label]) => (
+                <OptionButton
+                  key={value}
+                  label={label}
+                  selected={params.drawdownType === value}
+                  onClick={() => {
+                    setParams({ drawdownType: value as typeof params.drawdownType });
+                    close();
+                  }}
+                />
+              ))}
+            </>
+          )}
         </FilterChip>
 
         {/* Evaluation Type */}
@@ -185,16 +192,21 @@ export function FilterBar() {
           }
           onClear={() => clearFilter('evaluationType')}
         >
-          {Object.entries(EVAL_LABELS).map(([value, label]) => (
-            <OptionButton
-              key={value}
-              label={label}
-              selected={params.evaluationType === value}
-              onClick={() =>
-                setParams({ evaluationType: value as typeof params.evaluationType })
-              }
-            />
-          ))}
+          {(close) => (
+            <>
+              {Object.entries(EVAL_LABELS).map(([value, label]) => (
+                <OptionButton
+                  key={value}
+                  label={label}
+                  selected={params.evaluationType === value}
+                  onClick={() => {
+                    setParams({ evaluationType: value as typeof params.evaluationType });
+                    close();
+                  }}
+                />
+              ))}
+            </>
+          )}
         </FilterChip>
 
         {/* Funding Style */}
@@ -205,16 +217,21 @@ export function FilterBar() {
           }
           onClear={() => clearFilter('fundingStyle')}
         >
-          {Object.entries(FUNDING_LABELS).map(([value, label]) => (
-            <OptionButton
-              key={value}
-              label={label}
-              selected={params.fundingStyle === value}
-              onClick={() =>
-                setParams({ fundingStyle: value as typeof params.fundingStyle })
-              }
-            />
-          ))}
+          {(close) => (
+            <>
+              {Object.entries(FUNDING_LABELS).map(([value, label]) => (
+                <OptionButton
+                  key={value}
+                  label={label}
+                  selected={params.fundingStyle === value}
+                  onClick={() => {
+                    setParams({ fundingStyle: value as typeof params.fundingStyle });
+                    close();
+                  }}
+                />
+              ))}
+            </>
+          )}
         </FilterChip>
 
         {/* Toggle chips */}

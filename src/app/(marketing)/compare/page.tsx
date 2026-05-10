@@ -31,19 +31,22 @@ async function getFirmsWithScores(): Promise<ScoredFirm[]> {
   });
 
   return firms.map((firm) => {
+    // Destructure `offers` out so the raw Prisma array (with Decimal discountAmount)
+    // never reaches the Client Component boundary.
+    const { offers, ...firmWithoutOffers } = firm;
     const firmData = {
-      ...firm,
+      ...firmWithoutOffers,
       challengeFee: firm.challengeFee?.toString() ?? null,
     };
     const score = computeFirmScore(firmData);
-    const bestOffer = firm.offers[0]
+    const bestOffer = offers[0]
       ? {
-          id: firm.offers[0].id,
-          code: firm.offers[0].code,
-          discountPercent: firm.offers[0].discountPercent,
-          discountAmount: firm.offers[0].discountAmount?.toString() ?? null,
-          isExclusive: firm.offers[0].isExclusive,
-          affiliateUrl: firm.offers[0].affiliateUrl,
+          id: offers[0].id,
+          code: offers[0].code,
+          discountPercent: offers[0].discountPercent,
+          discountAmount: offers[0].discountAmount?.toString() ?? null,
+          isExclusive: offers[0].isExclusive,
+          affiliateUrl: offers[0].affiliateUrl,
         }
       : null;
 

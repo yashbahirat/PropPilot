@@ -3,7 +3,7 @@
 import { useCompareParams } from '@/hooks/use-compare-params';
 import { Input } from '@/components/ui/input';
 import { Search, X } from 'lucide-react';
-import { useRef } from 'react';
+import { useRef, useState, useEffect } from 'react';
 
 /**
  * Search bar for filtering firms by name.
@@ -13,12 +13,32 @@ import { useRef } from 'react';
 export function SearchBar() {
   const { params, setParams } = useCompareParams();
   const inputRef = useRef<HTMLInputElement>(null);
+  
+  // Local state for immediate typing feedback without lag
+  const [localValue, setLocalValue] = useState(params.q || '');
+
+  // Sync external changes (e.g. clicking clear elsewhere) to local state
+  useEffect(() => {
+    setLocalValue(params.q || '');
+  }, [params.q]);
+
+  // Debounce the URL update to prevent router thrashing
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      // Only push to URL if it differs from current param (avoids infinite loop)
+      if (localValue !== (params.q || '')) {
+        setParams({ q: localValue || null });
+      }
+    }, 250);
+    return () => clearTimeout(timer);
+  }, [localValue, params.q, setParams]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setParams({ q: e.target.value || null });
+    setLocalValue(e.target.value);
   };
 
   const handleClear = () => {
+    setLocalValue('');
     setParams({ q: null });
     inputRef.current?.focus();
   };
@@ -30,7 +50,7 @@ export function SearchBar() {
         ref={inputRef}
         id="firm-search"
         type="search"
-        value={params.q}
+        value={localValue}
         onChange={handleChange}
         placeholder="Search firms..."
         className="pl-9 pr-9 bg-white/5 border-white/10 text-white placeholder:text-white/30 focus:border-[#00D4AA]/50 focus-visible:ring-0 h-9 text-sm"

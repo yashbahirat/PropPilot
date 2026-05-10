@@ -1,20 +1,24 @@
 'use client';
+import { useCallback } from 'react';
 
-import { useQueryStates } from 'nuqs';
+import { useQueryStates, UseQueryStatesOptions } from 'nuqs';
 import { compareParamsParsers, CompareParams } from '@/lib/compare-params';
 
-export function useCompareParams() {
-  const [params, setParams] = useQueryStates(compareParamsParsers, {
-    shallow: true,   // Don't trigger full page re-render on filter changes
-    history: 'replace', // Replace instead of push to avoid polluting browser history
-  });
+const queryOptions = {
+  shallow: true,
+  history: 'replace' as const,
+  throttleMs: 250,
+};
 
-  const clearFilter = (key: keyof typeof compareParamsParsers) => {
+export function useCompareParams() {
+  const [params, setParams] = useQueryStates(compareParamsParsers, queryOptions);
+
+  const clearFilter = useCallback((key: keyof typeof compareParamsParsers) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     setParams({ [key]: null } as any);
-  };
+  }, [setParams]);
 
-  const clearAllFilters = () => {
+  const clearAllFilters = useCallback(() => {
     setParams({
       q: null,
       sort: null,
@@ -29,24 +33,31 @@ export function useCompareParams() {
       eaAllowed: null,
       compare: null,
     });
-  };
+  }, [setParams]);
 
-  const addToCompare = (slug: string) => {
-    if (params.compare.length >= 3 || params.compare.includes(slug)) return;
-    setParams({ compare: [...params.compare, slug] });
-  };
+  const addToCompare = useCallback((slug: string) => {
+    setParams((prev) => {
+      const current = prev.compare || [];
+      if (current.length >= 3 || current.includes(slug)) return {}; // Return empty object instead of prev to avoid unnecessary updates
+      return { compare: [...current, slug] };
+    });
+  }, [setParams]);
 
-  const removeFromCompare = (slug: string) => {
-    setParams({ compare: params.compare.filter((s) => s !== slug) });
-  };
+  const removeFromCompare = useCallback((slug: string) => {
+    setParams((prev) => {
+      const current = prev.compare || [];
+      return { compare: current.filter((s) => s !== slug) };
+    });
+  }, [setParams]);
 
-  const isInCompare = (slug: string) => params.compare.includes(slug);
+  const isInCompare = useCallback((slug: string) => params.compare.includes(slug), [params.compare]);
 
+  // A filter is active when it's non-null/non-default
   const hasActiveFilters =
     params.q !== '' ||
-    (params.drawdownType !== '' && params.drawdownType !== null) ||
-    (params.evaluationType !== '' && params.evaluationType !== null) ||
-    (params.fundingStyle !== '' && params.fundingStyle !== null) ||
+    params.drawdownType !== null ||
+    params.evaluationType !== null ||
+    params.fundingStyle !== null ||
     params.minFee > 0 ||
     params.maxFee > 0 ||
     params.hasDiscount ||

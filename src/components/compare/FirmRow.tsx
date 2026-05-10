@@ -1,5 +1,7 @@
 'use client';
 
+import { useCallback, memo } from 'react';
+
 import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -8,11 +10,14 @@ import { RulesBadges } from './RulesBadges';
 import { CopyCodeButton } from './CopyCodeButton';
 import { ExternalLink, CheckCircle2, Calendar } from 'lucide-react';
 import { ScoredFirm } from '@/lib/scoring';
-import { useCompareParams } from '@/hooks/use-compare-params';
 import { format } from 'date-fns';
 
 interface FirmRowProps {
   firm: ScoredFirm;
+  inCompare: boolean;
+  compareDisabled: boolean;
+  addToCompare: (slug: string) => void;
+  removeFromCompare: (slug: string) => void;
 }
 
 function MetricCell({ label, value }: { label: string; value: React.ReactNode }) {
@@ -38,10 +43,17 @@ const DRAWDOWN_LABELS: Record<string, string> = {
  * Shows all key metrics inline in an 8-column grid.
  * Uses @tanstack/react-table data model from parent FirmList.
  */
-export function FirmRow({ firm }: FirmRowProps) {
-  const { addToCompare, removeFromCompare, isInCompare, params } = useCompareParams();
-  const inCompare = isInCompare(firm.slug);
-  const compareCount = params.compare.length;
+export const FirmRow = memo(function FirmRow({
+  firm,
+  inCompare,
+  compareDisabled,
+  addToCompare,
+  removeFromCompare,
+}: FirmRowProps) {
+  const onToggleCompareClick = useCallback(() => {
+    if (inCompare) removeFromCompare(firm.slug);
+    else addToCompare(firm.slug);
+  }, [inCompare, firm.slug, removeFromCompare, addToCompare]);
 
   const trueCost =
     firm.challengeFee && firm.bestOffer?.discountPercent
@@ -54,15 +66,13 @@ export function FirmRow({ firm }: FirmRowProps) {
       <div className="flex items-center gap-3 min-w-0">
         {/* Compare toggle */}
         <button
-          onClick={() =>
-            inCompare ? removeFromCompare(firm.slug) : addToCompare(firm.slug)
-          }
-          disabled={!inCompare && compareCount >= 3}
+          onClick={onToggleCompareClick}
+          disabled={compareDisabled && !inCompare}
           className="shrink-0 text-white/25 hover:text-[#00D4AA] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
           title={
             inCompare
               ? 'Remove from comparison'
-              : compareCount >= 3
+              : compareDisabled
               ? 'Max 3 firms selected'
               : 'Add to comparison'
           }
@@ -216,4 +226,4 @@ export function FirmRow({ firm }: FirmRowProps) {
       </div>
     </div>
   );
-}
+});

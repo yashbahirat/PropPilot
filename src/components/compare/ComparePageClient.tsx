@@ -1,6 +1,5 @@
 'use client';
 
-import { NuqsAdapter } from 'nuqs/adapters/next/app';
 import { ScoredFirm } from '@/lib/scoring';
 import { FilterBar } from './FilterBar';
 import { FilterDrawer } from './FilterDrawer';
@@ -11,6 +10,7 @@ import { ComparisonDock } from './ComparisonDock';
 import { ComparisonView } from './ComparisonView';
 import { AffiliateDisclosureBanner } from './AffiliateDisclosureBanner';
 import { useCompareParams } from '@/hooks/use-compare-params';
+import { Suspense, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 interface ComparePageInnerProps {
@@ -20,15 +20,22 @@ interface ComparePageInnerProps {
 function ComparePageInner({ firms }: ComparePageInnerProps) {
   const { params, setParams } = useCompareParams();
   const router = useRouter();
-  const isComparisonView = params.compare.length >= 2;
+  const isComparisonView = params.showCompare;
 
   // Firms selected for side-by-side comparison
   const comparedFirms = params.compare
     .map((slug) => firms.find((f) => f.slug === slug))
     .filter((f): f is ScoredFirm => Boolean(f));
 
+  // Auto-close comparison if too few firms remain
+  useEffect(() => {
+    if (isComparisonView && comparedFirms.length < 2) {
+      setParams({ showCompare: null });
+    }
+  }, [comparedFirms.length, isComparisonView, setParams]);
+
   const handleBackToList = () => {
-    setParams({ compare: null });
+    setParams({ showCompare: null });
   };
 
   return (
@@ -118,12 +125,8 @@ interface ComparePageClientProps {
 
 /**
  * Root client component for the /compare page.
- * Wraps ComparePageInner in NuqsAdapter to enable URL state management.
+ * NuqsAdapter is provided by the root layout — no wrapper needed here.
  */
 export function ComparePageClient({ firms }: ComparePageClientProps) {
-  return (
-    <NuqsAdapter>
-      <ComparePageInner firms={firms} />
-    </NuqsAdapter>
-  );
+  return <ComparePageInner firms={firms} />;
 }

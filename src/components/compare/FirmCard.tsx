@@ -8,11 +8,15 @@ import { RulesBadges } from './RulesBadges';
 import { CopyCodeButton } from './CopyCodeButton';
 import { ExternalLink, CheckCircle2, Calendar } from 'lucide-react';
 import { ScoredFirm } from '@/lib/scoring';
-import { useCompareParams } from '@/hooks/use-compare-params';
 import { format } from 'date-fns';
+import { memo, useCallback } from 'react';
 
 interface FirmCardProps {
   firm: ScoredFirm;
+  inCompare: boolean;
+  compareDisabled: boolean;
+  addToCompare: (slug: string) => void;
+  removeFromCompare: (slug: string) => void;
 }
 
 function DataRow({ label, value }: { label: string; value: React.ReactNode }) {
@@ -36,10 +40,17 @@ const DRAWDOWN_LABELS: Record<string, string> = {
  * Stacks all metrics vertically in a rounded card.
  * Shows the same data as FirmRow but in a touch-friendly layout.
  */
-export function FirmCard({ firm }: FirmCardProps) {
-  const { addToCompare, removeFromCompare, isInCompare, params } = useCompareParams();
-  const inCompare = isInCompare(firm.slug);
-  const compareCount = params.compare.length;
+export const FirmCard = memo(function FirmCard({
+  firm,
+  inCompare,
+  compareDisabled,
+  addToCompare,
+  removeFromCompare,
+}: FirmCardProps) {
+  const onToggleCompareClick = useCallback(() => {
+    if (inCompare) removeFromCompare(firm.slug);
+    else addToCompare(firm.slug);
+  }, [inCompare, firm.slug, removeFromCompare, addToCompare]);
 
   const trueCost =
     firm.challengeFee && firm.bestOffer?.discountPercent
@@ -86,10 +97,8 @@ export function FirmCard({ firm }: FirmCardProps) {
         <div className="flex flex-col items-end gap-1.5">
           <ScoreBadge score={firm.overallScore} size="lg" />
           <button
-            onClick={() =>
-              inCompare ? removeFromCompare(firm.slug) : addToCompare(firm.slug)
-            }
-            disabled={!inCompare && compareCount >= 3}
+            onClick={onToggleCompareClick}
+            disabled={compareDisabled && !inCompare}
             className="text-xs text-white/40 hover:text-[#00D4AA] flex items-center gap-1 transition-colors disabled:opacity-30"
             aria-label={inCompare ? `Remove ${firm.name} from comparison` : `Compare ${firm.name}`}
           >
@@ -195,4 +204,4 @@ export function FirmCard({ firm }: FirmCardProps) {
       </div>
     </div>
   );
-}
+});

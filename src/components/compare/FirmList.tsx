@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useDeferredValue, useMemo, useCallback } from 'react';
 import {
   useReactTable,
   getCoreRowModel,
@@ -15,7 +15,7 @@ import { useCompareParams } from '@/hooks/use-compare-params';
 import { SortOption } from '@/lib/compare-params';
 import { FirmRow } from './FirmRow';
 import { FirmCard } from './FirmCard';
-import { useWindowWidth } from '@/hooks/use-window-width';
+import { useIsMobile } from '@/hooks/use-window-width';
 
 interface FirmListProps {
   firms: ScoredFirm[];
@@ -25,9 +25,9 @@ interface FirmListProps {
 
 interface FilterValue {
   q: string;
-  drawdownType: string;
-  evaluationType: string;
-  fundingStyle: string;
+  drawdownType: string | null;
+  evaluationType: string | null;
+  fundingStyle: string | null;
   minFee: number;
   maxFee: number;
   hasDiscount: boolean;
@@ -41,11 +41,11 @@ const firmFilterFn: FilterFn<ScoredFirm> = (row, _columnId, filterValue: FilterV
 
   if (filterValue.q && !firm.name.toLowerCase().includes(filterValue.q.toLowerCase()))
     return false;
-  if (filterValue.drawdownType && firm.drawdownType !== filterValue.drawdownType)
+  if (filterValue.drawdownType != null && firm.drawdownType !== filterValue.drawdownType)
     return false;
-  if (filterValue.evaluationType && firm.evaluationType !== filterValue.evaluationType)
+  if (filterValue.evaluationType != null && firm.evaluationType !== filterValue.evaluationType)
     return false;
-  if (filterValue.fundingStyle && firm.fundingStyle !== filterValue.fundingStyle)
+  if (filterValue.fundingStyle != null && firm.fundingStyle !== filterValue.fundingStyle)
     return false;
   if (
     filterValue.minFee > 0 &&
@@ -117,7 +117,7 @@ const SORT_FN_MAP: Record<SortOption, SortingFn<ScoredFirm>> = {
 
 const columnHelper = createColumnHelper<ScoredFirm>();
 
-// ─── FirmList Component ────────────────────────────────────────────────────
+// ─── Table header labels ─────────────────────────────────────────────────
 
 const TABLE_HEADERS = [
   'Firm',
@@ -130,22 +130,31 @@ const TABLE_HEADERS = [
   'Actions',
 ];
 
+// ─── FirmList Component ────────────────────────────────────────────────────
+
 /**
  * Client component that renders the filterable, sortable firm list.
+ * Owns the compare state subscription (useCompareParams called once here,
+ * NOT in each row — prevents N re-renders per URL update).
  * Uses @tanstack/react-table for data logic.
  * Renders FirmRow (desktop) or FirmCard (mobile < 768px).
  */
-export function FirmList({ firms }: FirmListProps) {
-  const { params } = useCompareParams();
-  const windowWidth = useWindowWidth();
-  const isMobile = windowWidth !== null && windowWidth < 768;
+export function FirmList({ firms }: FirmListProps) { console.log("FirmList render");
+  const { params, addToCompare, removeFromCompare, isInCompare } = useCompareParams();
+  const isMobile = useIsMobile();
+
+  // Defer the search query so typing doesn't block rendering the row list
+  const deferredQ = useDeferredValue(params.q);
+
+  const compareCount = params.compare.length;
+  const compareDisabled = compareCount >= 3;
 
   const filterValue: FilterValue = useMemo(
     () => ({
-      q: params.q,
-      drawdownType: params.drawdownType ?? '',
-      evaluationType: params.evaluationType ?? '',
-      fundingStyle: params.fundingStyle ?? '',
+      q: deferredQ,
+      drawdownType: params.drawdownType,
+      evaluationType: params.evaluationType,
+      fundingStyle: params.fundingStyle,
       minFee: params.minFee,
       maxFee: params.maxFee,
       hasDiscount: params.hasDiscount,
@@ -153,7 +162,19 @@ export function FirmList({ firms }: FirmListProps) {
       weekendHolding: params.weekendHolding,
       eaAllowed: params.eaAllowed,
     }),
-    [params]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [
+      deferredQ,
+      params.drawdownType,
+      params.evaluationType,
+      params.fundingStyle,
+      params.minFee,
+      params.maxFee,
+      params.hasDiscount,
+      params.newsTrading,
+      params.weekendHolding,
+      params.eaAllowed,
+    ]
   );
 
   const sortingFn = SORT_FN_MAP[params.sort] ?? sortByScore;
@@ -170,16 +191,21 @@ export function FirmList({ firms }: FirmListProps) {
     [sortingFn]
   );
 
+  const tableState = useMemo(
+    () => ({
+      columnFilters: [{ id: 'firm', value: filterValue }],
+      sorting: [{ id: 'firm', desc: false }],
+    }),
+    [filterValue, params.sort]
+  );
+
   const table = useReactTable({
     data: firms,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    state: {
-      columnFilters: [{ id: 'firm', value: filterValue }],
-      sorting: [{ id: 'firm', desc: false }],
-    },
+    state: tableState,
   });
 
   const rows = table.getRowModel().rows;
@@ -217,17 +243,31 @@ export function FirmList({ firms }: FirmListProps) {
         </div>
       )}
 
-      {/* Rows or Cards */}
+      {/* Rows or Cards — compare state passed as props, not subscribed per-row */}
       {isMobile ? (
         <div className="grid grid-cols-1 gap-4 p-4">
           {rows.map((row) => (
-            <FirmCard key={row.original.id} firm={row.original} />
+            <FirmCard
+              key={row.original.id}
+              firm={row.original}
+              inCompare={isInCompare(row.original.slug)}
+              compareDisabled={compareDisabled}
+              addToCompare={addToCompare}
+              removeFromCompare={removeFromCompare}
+            />
           ))}
         </div>
       ) : (
         <div>
           {rows.map((row) => (
-            <FirmRow key={row.original.id} firm={row.original} />
+            <FirmRow
+              key={row.original.id}
+              firm={row.original}
+              inCompare={isInCompare(row.original.slug)}
+              compareDisabled={compareDisabled}
+              addToCompare={addToCompare}
+              removeFromCompare={removeFromCompare}
+            />
           ))}
         </div>
       )}

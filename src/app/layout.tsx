@@ -45,7 +45,7 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en" className={`${inter.variable} dark`} suppressHydrationWarning>
-        <body className="font-sans antialiased min-h-screen" style={{ backgroundColor: '#08080F', color: 'hsl(210 40% 95%)' }}>
+        <body className="font-sans antialiased min-h-screen" style={{ backgroundColor: '#08080F', color: 'hsl(210 40% 95%)' }} suppressHydrationWarning>
           {/* Skip to main content for accessibility */}
           <a
             href="#main-content"
@@ -59,7 +59,7 @@ export default function RootLayout({
           </NuqsAdapter>
           <Toaster
             theme="dark"
-            position="bottom-right"
+            position="top-right"
             toastOptions={{
               style: {
                 background: '#0E0E1A',

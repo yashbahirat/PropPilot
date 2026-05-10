@@ -33,9 +33,7 @@ export function ComparisonDock({ firms }: ComparisonDockProps) {
 
   const handleCompareNow = () => {
     if (selectedFirms.length < 2) return;
-    // Build URL with compare slugs
-    const url = serializeParams({ compare: params.compare });
-    router.push(`/compare${url}`);
+    setParams({ showCompare: true });
   };
 
   return (
