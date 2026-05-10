@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 current_phase: 5
-status: planning
-last_updated: "2026-05-09T19:17:48.315Z"
+status: Phase 4 shipped — directly to main
+last_updated: "2026-05-10T06:08:09.452Z"
 progress:
   total_phases: 12
   completed_phases: 3
@@ -15,7 +15,7 @@ progress:
 
 # State: PropPilot
 
-**Status:** Ready to plan
+**Status:** Phase 4 shipped — directly to main
 **Current Phase:** 5
 **Last Updated:** 2026-05-03
 
