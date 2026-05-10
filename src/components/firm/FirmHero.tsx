@@ -2,6 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Prisma } from '@prisma/client';
 import RuleDifficultyScore from './RuleDifficultyScore';
+import CopyCodeButton from './CopyCodeButton';
 
 // Type for firm with included relations
 type FirmWithRelations = Prisma.FirmGetPayload<{
@@ -131,13 +132,9 @@ export default function FirmHero({ firm }: FirmHeroProps) {
               >
                 Visit Site →
               </Link>
-              {/* Copy Code placeholder — replaced in Plan 03 */}
-              <button
-                className="inline-flex items-center justify-center px-6 py-2.5 rounded-lg border border-[#00D4AA] text-[#00D4AA] text-sm font-semibold bg-transparent hover:bg-[#00D4AA]/10 transition-colors disabled:opacity-50"
-                disabled={!bestOffer?.code}
-              >
-                Copy Code
-              </button>
+              {bestOffer?.code && (
+                <CopyCodeButton code={bestOffer.code} />
+              )}
             </div>
 
             {/* Affiliate Disclosure */}

@@ -10,6 +10,9 @@ import {
 } from '@/components/ui/accordion';
 import OverviewTab from './tabs/OverviewTab';
 import ProsConsTab from './tabs/ProsConsTab';
+import RulesTab from './tabs/RulesTab';
+import PricingTab from './tabs/PricingTab';
+import PayoutsTab from './tabs/PayoutsTab';
 
 type FirmWithRelations = Prisma.FirmGetPayload<{
   include: {
@@ -47,8 +50,14 @@ function TabContent({
       return <OverviewTab firm={firm} />;
     case 'pros-cons':
       return <ProsConsTab firm={firm} />;
+    case 'rules':
+      return <RulesTab firm={firm} />;
+    case 'pricing':
+      return <PricingTab firm={firm} />;
+    case 'payouts':
+      return <PayoutsTab firm={firm} />;
     default:
-      // Placeholder for plans 03 and 04
+      // Placeholder for plans 03 and 04 (Reviews/FAQs — wired in Plan 04)
       return (
         <div className="flex flex-col items-center justify-center py-16 text-center">
           <p className="text-base font-semibold text-white mb-1">
