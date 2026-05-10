@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import { db } from '@/lib/db';
 import FirmHero from '@/components/firm/FirmHero';
+import FirmDetailNav from '@/components/firm/FirmDetailNav';
 
 export const runtime = 'nodejs';
 
@@ -36,7 +37,7 @@ export default async function FirmDetailPage({ params }: FirmDetailPageProps) {
   return (
     <main className="min-h-screen bg-[#08080F]">
       <FirmHero firm={firm} />
-      {/* TODO: FirmDetailNav */}
+      <FirmDetailNav firm={firm} />
     </main>
   );
 }
