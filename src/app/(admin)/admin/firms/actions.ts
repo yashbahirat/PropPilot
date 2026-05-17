@@ -20,6 +20,8 @@ export async function saveFirm(data: z.infer<typeof firmSchema>, id?: string) {
     const dbData = {
       ...parsed,
       logoUrl: parsed.logoUrl || null,
+      heroBgImageUrl: (parsed as any).heroBgImageUrl || null,
+      heroVideoUrl: (parsed as any).heroVideoUrl || null,
       description: parsed.description || null,
       websiteUrl: parsed.websiteUrl || null,
       affiliateUrl: parsed.affiliateUrl || null,

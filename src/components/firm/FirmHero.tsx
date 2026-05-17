@@ -56,32 +56,45 @@ export function FirmHero({ firm }: FirmHeroProps) {
     visible: { scale: 1, opacity: 1, transition: { type: "spring", stiffness: 150, damping: 15 } }
   }
 
-  // Use a stunning, dark, premium abstract mesh from Unsplash as the base backdrop
-  const bgImage = "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop"
+  // Use firm-specific media if set, fallback to premium default
+  const FALLBACK_BG = "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop"
+  const bgImage = (firm as any).heroBgImageUrl || FALLBACK_BG
+  const bgVideo = (firm as any).heroVideoUrl as string | null | undefined
 
   return (
     <LazyMotion features={domAnimation}>
       <section className="relative w-full min-h-[70vh] md:min-h-[600px] flex items-end pb-12 overflow-hidden bg-[#000000]">
         
-        {/* Full-Bleed Background Image with Subtle Slow Pan */}
-        <m.div 
-          className="absolute inset-0 z-0"
-          initial={{ scale: 1.1, opacity: 0 }}
-          animate={{ scale: 1, opacity: 0.4 }}
-          transition={{ duration: 1.5, ease: "easeOut" }}
-        >
-          <Image
-            src={bgImage}
-            alt="Premium abstract background"
-            fill
-            className="object-cover object-center"
-            priority
+        {/* Background: video takes priority, then image */}
+        {bgVideo ? (
+          <video
+            className="absolute inset-0 z-0 w-full h-full object-cover opacity-40"
+            src={bgVideo}
+            autoPlay
+            loop
+            muted
+            playsInline
           />
-        </m.div>
+        ) : (
+          <m.div 
+            className="absolute inset-0 z-0"
+            initial={{ scale: 1.1, opacity: 0 }}
+            animate={{ scale: 1, opacity: 0.4 }}
+            transition={{ duration: 1.5, ease: "easeOut" }}
+          >
+            <Image
+              src={bgImage}
+              alt="Hero background"
+              fill
+              className="object-cover object-center"
+              priority
+            />
+          </m.div>
+        )}
 
-        {/* Netflix-style heavy bottom gradient fading to true black */}
-        <div className="absolute inset-0 z-0 bg-gradient-to-t from-[#08080F] via-[#08080F]/80 to-transparent pointer-events-none" />
-        <div className="absolute inset-0 z-0 bg-gradient-to-r from-[#08080F] via-transparent to-transparent pointer-events-none" />
+        {/* Heavy gradients to ensure text legibility over the background image */}
+        <div className="absolute inset-0 z-0 bg-gradient-to-t from-[#08080F] via-[#08080F]/90 to-[#08080F]/40 pointer-events-none" />
+        <div className="absolute inset-0 z-0 bg-gradient-to-r from-[#08080F]/95 via-[#08080F]/60 to-transparent pointer-events-none" />
         
         {/* Content Container */}
         <div className="container mx-auto px-4 relative z-10 w-full pt-32">
@@ -126,12 +139,12 @@ export function FirmHero({ firm }: FirmHeroProps) {
                 )}
               </div>
 
-              {/* Massive Bold Typography (Apple style) */}
-              <m.div variants={textVariants} className="space-y-2">
-                <h1 className="text-5xl md:text-7xl lg:text-8xl font-black text-white tracking-tighter leading-[0.9] drop-shadow-2xl">
+              {/* Bold Typography — Netflix/Apple style */}
+              <m.div variants={textVariants} className="space-y-3">
+                <h1 className="text-5xl md:text-7xl font-black text-white tracking-normal leading-tight" style={{ textShadow: '0 2px 20px rgba(0,0,0,0.8), 0 0 60px rgba(0,0,0,0.6)' }}>
                   {firm.name}
                 </h1>
-                <p className="text-lg md:text-2xl text-white/70 font-medium tracking-tight max-w-2xl leading-snug">
+                <p className="text-base md:text-lg text-white/60 font-normal tracking-normal max-w-xl leading-relaxed">
                   {firm.description || "Empowering traders with institutional-grade capital and industry-leading payout speeds."}
                 </p>
               </m.div>

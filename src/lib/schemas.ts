@@ -8,6 +8,8 @@ export const firmSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters." }),
   slug: z.string().min(2, { message: "Slug must be at least 2 characters." }),
   logoUrl: z.string().url({ message: "Please enter a valid URL." }).optional().or(z.literal("")),
+  heroBgImageUrl: z.string().url({ message: "Please enter a valid URL." }).optional().or(z.literal("")),
+  heroVideoUrl: z.string().url({ message: "Please enter a valid URL." }).optional().or(z.literal("")),
   description: z.string().optional().or(z.literal("")),
   websiteUrl: z.string().url({ message: "Please enter a valid URL." }).optional().or(z.literal("")),
   affiliateUrl: z.string().url({ message: "Please enter a valid URL." }).optional().or(z.literal("")),

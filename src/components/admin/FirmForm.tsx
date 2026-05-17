@@ -45,6 +45,8 @@ export function FirmForm({ initialData }: FirmFormProps) {
         name: initialData.name ?? "",
         slug: initialData.slug ?? "",
         logoUrl: initialData.logoUrl ?? "",
+        heroBgImageUrl: (initialData as any).heroBgImageUrl ?? "",
+        heroVideoUrl: (initialData as any).heroVideoUrl ?? "",
         description: initialData.description ?? "",
         websiteUrl: initialData.websiteUrl ?? "",
         affiliateUrl: initialData.affiliateUrl ?? "",
@@ -62,6 +64,8 @@ export function FirmForm({ initialData }: FirmFormProps) {
         name: "",
         slug: "",
         logoUrl: "",
+        heroBgImageUrl: "",
+        heroVideoUrl: "",
         description: "",
         websiteUrl: "",
         affiliateUrl: "",
@@ -174,6 +178,35 @@ export function FirmForm({ initialData }: FirmFormProps) {
                     <FormControl>
                       <Input placeholder="https://..." {...field} className="bg-[#1A1A24] border-[#2A2A35] text-white" />
                     </FormControl>
+                    <FormDescription className="text-zinc-500">Direct URL to the firm's logo image (SVG, PNG, or WebP).</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="heroBgImageUrl"
+                render={({ field }) => (
+                  <FormItem className="md:col-span-2">
+                    <FormLabel>Hero Background Image URL</FormLabel>
+                    <FormControl>
+                      <Input placeholder="https://..." {...field} className="bg-[#1A1A24] border-[#2A2A35] text-white" />
+                    </FormControl>
+                    <FormDescription className="text-zinc-500">Full-bleed background image shown behind the firm name. Recommended: 2560×1440px dark abstract.</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="heroVideoUrl"
+                render={({ field }) => (
+                  <FormItem className="md:col-span-2">
+                    <FormLabel>Hero Background Video URL</FormLabel>
+                    <FormControl>
+                      <Input placeholder="https://...mp4" {...field} className="bg-[#1A1A24] border-[#2A2A35] text-white" />
+                    </FormControl>
+                    <FormDescription className="text-zinc-500">Optional looping video (mp4) for the hero. If set, takes priority over the background image.</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}

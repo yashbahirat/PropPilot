@@ -77,6 +77,8 @@ model Firm {
   slug           String   @unique
   name           String
   logoUrl        String?
+  heroBgImageUrl String?   // Custom hero background image URL
+  heroVideoUrl   String?   // Custom hero background video URL (mp4)
   description    String?
   websiteUrl     String?
   affiliateUrl   String?
