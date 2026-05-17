@@ -4,7 +4,7 @@ milestone: v1.0
 milestone_name: milestone
 current_phase: 05
 status: Phase 05 shipped — pushed to origin/main
-last_updated: "2026-05-17T04:58:37.229Z"
+last_updated: "2026-05-17T15:58:08.235Z"
 progress:
   total_phases: 12
   completed_phases: 3
@@ -47,7 +47,7 @@ See: .planning/PROJECT.md (updated 2026-05-03)
 
 - Research complete: STACK.md, FEATURES.md, ARCHITECTURE.md, PITFALLS.md, SUMMARY.md
 - **Latest action:** Milestone v1.0 summary generated
-- **Resume file:** None
+- **Resume file:** .planning/phases/06-affiliate-tracking/06-CONTEXT.md
 - Requirements: 73 v1 requirements defined across 14 categories
 - Config: interactive mode, fine granularity, parallel execution, balanced model profile
 - Key pitfall reminders: await all Next.js 15 request APIs, Prisma must use nodejs runtime, UploadThing for file uploads, clerkMiddleware() pattern
