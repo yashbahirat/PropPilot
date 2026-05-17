@@ -40,21 +40,67 @@ result: pass
 expected: Clicking the 'Pros & Cons' tab/accordion displays two distinct lists (Pros with checkmarks, Cons with X marks). If a firm has no pros/cons data, a clean empty state message is shown instead.
 result: pass
 
+### 7. Copy Code Interaction
+expected: Clicking the 'Copy Code' button changes the text to "Copied!" and triggers a toast notification (if implemented), successfully copying the code to the clipboard.
+result: pass
+
+### 8. Rules, Pricing, and Payouts Tabs
+expected: Clicking the Rules, Pricing, and Payouts tabs displays accurate data in data-dense layouts, including the true-cost calculation table in the Pricing tab.
+result: pass
+
+### 9. Review Submission Workflow
+expected: Clicking "Write a Review" in the Reviews tab opens the Dialog modal. When submitted as a logged-in user, the review is created successfully without errors.
+result: pass
+
+### 10. FAQs Interactivity
+expected: The FAQs tab displays a list of questions that expand and collapse correctly using the accordion component.
+result: issue
+reported: "fail: No FAQs yet"
+severity: testing
+
+### 11. Hero UI/UX Enhancements (Gap Closure)
+expected: Navigate to `/firms/topstep`. Observe the stagger entrance animation of the hero elements. Verify the background gradients, dynamic glowing orbs, and typography appear premium and align with the "Netflix-style" fintech aesthetic.
+result: issue
+reported: "fail: not upto the expectations"
+severity: cosmetic
+
 ## Summary
 
-total: 6
-passed: 5
-issues: 1
+total: 11
+passed: 8
+issues: 3
 pending: 0
 skipped: 0
 
 ## Gaps
 
-- truth: "Navigate to a firm's detail page (e.g., `/firms/topstep`). The page displays a premium hero section with a dark gradient, the firm's logo, name, and primary CTAs ('Visit Site', 'Copy Code')."
+- truth: "The FAQs tab displays a list of questions that expand and collapse correctly using the accordion component."
   status: failed
-  reason: "User reported: pass but we need to make UI/UX more better for the user"
+  reason: "User reported: fail: No FAQs yet"
+  severity: testing
+  test: 10
+  root_cause: "The seed data does not include FAQs, so the empty state is shown instead of the accordion."
+  artifacts: []
+  missing:
+    - "Add FAQ seed data for testing the accordion component"
+
+- truth: "Navigate to `/firms/topstep`. Observe the stagger entrance animation of the hero elements. Verify the background gradients, dynamic glowing orbs, and typography appear premium and align with the "Netflix-style" fintech aesthetic."
+  status: failed
+  reason: "User reported: fail: not upto the expectations"
+  severity: cosmetic
+  test: 11
+  root_cause: "The implemented hero section UI/UX enhancements still do not meet the user's expectations for a premium, high-end fintech experience."
+  artifacts: []
+  missing:
+    - "Further iterate on FirmHero component to dramatically improve visual aesthetics."
+    - "Clarify specific missing elements with user (e.g. typography size, background intensity, layout structure)."
+
+- truth: "Navigate to a firm's detail page (e.g., `/firms/topstep`). The page displays a premium hero section with a dark gradient, the firm's logo, name, and primary CTAs ('Visit Site', 'Copy Code')."
+  status: resolved
+  reason: "Fixed in plan 05-05. Verify via Test 11."
   severity: cosmetic
   test: 2
+  root_cause: "The hero section's visual design felt basic."
   artifacts: []
   missing: []
 

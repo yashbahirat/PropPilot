@@ -26,12 +26,15 @@ export default async function FirmPage({ params }: FirmPageProps) {
     notFound()
   }
 
+  // Serialize Prisma objects (Decimal, Date) for Client Components
+  const serializedFirm = JSON.parse(JSON.stringify(firm)) as typeof firm
+
   return (
     <main className="flex min-h-screen flex-col bg-[#08080F]">
-      <FirmHero firm={firm} />
+      <FirmHero firm={serializedFirm} />
       
       <div className="container mx-auto px-4 pb-20">
-        <FirmDetailNav firm={firm} />
+        <FirmDetailNav firm={serializedFirm} />
       </div>
     </main>
   )

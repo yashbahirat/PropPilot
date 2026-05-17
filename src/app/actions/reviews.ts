@@ -14,10 +14,36 @@ const reviewSchema = z.object({
 
 export async function submitReview(formData: FormData) {
   try {
-    const { userId } = await auth()
+    const { userId: clerkId } = await auth()
     
-    if (!userId) {
+    if (!clerkId) {
       return { success: false, error: "You must be logged in to submit a review." }
+    }
+
+    // Map Clerk ID to Database User ID
+    let dbUser = await db.user.findUnique({
+      where: { clerkId }
+    })
+
+    // Lazy sync: if the user isn't in the DB yet, create them now.
+    // This happens often in local dev when webhooks aren't running.
+    if (!dbUser) {
+      const { currentUser } = await import("@clerk/nextjs/server")
+      const user = await currentUser()
+      
+      if (!user) {
+        return { success: false, error: "User profile not found. Please log out and back in." }
+      }
+
+      dbUser = await db.user.create({
+        data: {
+          clerkId: user.id,
+          email: user.emailAddresses[0]?.emailAddress || "",
+          firstName: user.firstName,
+          lastName: user.lastName,
+          imageUrl: user.imageUrl,
+        }
+      })
     }
 
     const data = {
@@ -42,7 +68,8 @@ export async function submitReview(formData: FormData) {
     await db.review.create({
       data: {
         firmId,
-        userId, // Clerk user ID
+        userId: dbUser.id, // Use database CUID, not Clerk ID
+
         rating,
         title,
         content,

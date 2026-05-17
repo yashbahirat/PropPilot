@@ -149,11 +149,29 @@ async function main() {
         update: { code: 'SAVE90', discountPercent: 90, description: '90% Off All Accounts', isActive: true, firmId: upsertedFirm.id },
         create: { id: 'seed-apex-offer-1', code: 'SAVE90', discountPercent: 90, description: '90% Off All Accounts', isActive: true, firmId: upsertedFirm.id },
       })
+      
+      // Seed FAQs
+      await prisma.fAQ.createMany({
+        data: [
+          { firmId: upsertedFirm.id, question: "What is the payout rule for Apex?", answer: "Apex allows you to request payouts twice a month. You must have traded a minimum of 10 trading days for your first payout.", sortOrder: 1 },
+          { firmId: upsertedFirm.id, question: "Do they allow news trading?", answer: "Yes, Apex Trader Funding allows you to trade during news events with no restrictions during the evaluation or funded phases.", sortOrder: 2 },
+        ],
+        skipDuplicates: true
+      })
     } else if (firm.slug === 'topstep') {
       await prisma.firmOffer.upsert({
         where: { id: 'seed-topstep-offer-1' },
         update: { code: 'TOPSTEP20', discountPercent: 20, description: '20% Off 50K Combine', isActive: true, firmId: upsertedFirm.id },
         create: { id: 'seed-topstep-offer-1', code: 'TOPSTEP20', discountPercent: 20, description: '20% Off 50K Combine', isActive: true, firmId: upsertedFirm.id },
+      })
+      
+      // Seed FAQs
+      await prisma.fAQ.createMany({
+        data: [
+          { firmId: upsertedFirm.id, question: "What is the Topstep Combine?", answer: "The Topstep Combine is a two-step evaluation process designed to test your profitability and risk management skills.", sortOrder: 1 },
+          { firmId: upsertedFirm.id, question: "What platforms are supported?", answer: "Topstep supports NinjaTrader, Tradovate, TradingView (via Tradovate), and Quantower.", sortOrder: 2 },
+        ],
+        skipDuplicates: true
       })
     }
   }
