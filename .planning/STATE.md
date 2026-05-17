@@ -3,19 +3,19 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 current_phase: 05
-status: executing
-last_updated: "2026-05-17T03:52:38.449Z"
+status: Phase 05 shipped — pushed to origin/main
+last_updated: "2026-05-17T04:58:37.229Z"
 progress:
   total_phases: 12
   completed_phases: 3
-  total_plans: 32
-  completed_plans: 21
-  percent: 66
+  total_plans: 34
+  completed_plans: 24
+  percent: 71
 ---
 
 # State: PropPilot
 
-**Status:** Executing Phase 05
+**Status:** Phase 05 shipped — pushed to origin/main
 **Current Phase:** 05
 **Last Updated:** 2026-05-17
 
