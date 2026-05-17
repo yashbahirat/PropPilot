@@ -1,116 +1,97 @@
-import { Prisma } from '@prisma/client';
+"use client"
 
-type FirmWithRelations = Prisma.FirmGetPayload<{
-  include: {
-    offers: true;
-    reviews: true;
-    faqs: true;
-  };
-}>;
+import React from "react"
+import { Firm } from "@prisma/client"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 interface OverviewTabProps {
-  firm: FirmWithRelations;
+  firm: Firm
 }
 
-const metricRows = [
-  { label: 'Max Drawdown', key: 'maxDrawdown', format: (v: number) => `${v}%` },
-  { label: 'Daily Loss Limit', key: 'dailyLossLimit', format: (v: number) => `${v}%` },
-  { label: 'Profit Target', key: 'profitTarget', format: (v: number) => `${v}%` },
-  { label: 'Profit Split', key: 'profitSplit', format: (v: number) => `${v}%` },
-  { label: 'Min Trading Days', key: 'minTradingDays', format: (v: number) => `${v} days` },
-  { label: 'Payout Speed', key: 'payoutSpeed', format: (v: string) => v },
-  { label: 'Max Account Size', key: 'maxAccountSize', format: (v: number) => `$${v.toLocaleString()}` },
-] as const;
-
-export default function OverviewTab({ firm }: OverviewTabProps) {
-  const approvedReviews = firm.reviews.filter((r) => r.isApproved);
-  const avgRating =
-    approvedReviews.length > 0
-      ? (
-          approvedReviews.reduce((sum, r) => sum + r.rating, 0) /
-          approvedReviews.length
-        ).toFixed(1)
-      : null;
-
+export function OverviewTab({ firm }: OverviewTabProps) {
   return (
-    <div className="space-y-8">
-      {/* Firm description / verdict */}
-      {firm.description && (
-        <div className="bg-[#1E1E30] rounded-lg border border-[#2E2E45] p-6">
-          <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-            Overview
-          </h2>
-          <p className="text-base text-white/90 leading-relaxed">{firm.description}</p>
-        </div>
-      )}
+    <div className="flex flex-col gap-6 w-full animate-fade-in">
+      {/* Description / Overview */}
+      <Card className="bg-[#1E1E30] border-prop-border shadow-card">
+        <CardHeader>
+          <CardTitle className="text-xl font-bold text-foreground">Firm Overview</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-muted-foreground leading-relaxed text-base">
+            {firm.description ? (
+              <p>{firm.description}</p>
+            ) : (
+              <p className="italic">No description available for this firm yet.</p>
+            )}
+          </div>
+        </CardContent>
+      </Card>
 
-      {/* Key metrics */}
-      <div className="bg-[#1E1E30] rounded-lg border border-[#2E2E45] p-6">
-        <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4">
-          Key Metrics
-        </h2>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-          {metricRows.map(({ label, key, format }) => {
-            const raw = firm[key as keyof typeof firm];
-            if (raw == null) return null;
-            return (
-              <div key={key} className="flex flex-col gap-1">
-                <span className="text-xs font-semibold text-muted-foreground">{label}</span>
-                <span className="text-base font-semibold text-white">
-                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                  {(format as (v: any) => string)(raw)}
-                </span>
-              </div>
-            );
-          })}
-
-          {/* Drawdown type */}
-          {firm.drawdownType && (
+      {/* Key Metrics Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+        <Card className="bg-[#1E1E30] border-prop-border shadow-card">
+          <CardContent className="pt-6">
             <div className="flex flex-col gap-1">
-              <span className="text-xs font-semibold text-muted-foreground">Drawdown Type</span>
-              <span className="text-base font-semibold text-white">
-                {firm.drawdownType.replace(/_/g, ' ')}
+              <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Account Sizes</span>
+              <span className="text-lg font-bold text-foreground">
+                {firm.minAccountSize && firm.maxAccountSize 
+                  ? `$${(firm.minAccountSize / 1000)}k - $${(firm.maxAccountSize / 1000)}k` 
+                  : "Varied"}
               </span>
             </div>
-          )}
-        </div>
+          </CardContent>
+        </Card>
+        
+        <Card className="bg-[#1E1E30] border-prop-border shadow-card">
+          <CardContent className="pt-6">
+            <div className="flex flex-col gap-1">
+              <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Profit Split</span>
+              <span className="text-lg font-bold text-foreground">
+                {firm.profitSplit ? `Up to ${firm.profitSplit}%` : "Standard"}
+              </span>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-[#1E1E30] border-prop-border shadow-card">
+          <CardContent className="pt-6">
+            <div className="flex flex-col gap-1">
+              <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Evaluation</span>
+              <span className="text-lg font-bold text-foreground">
+                {firm.evaluationType ? firm.evaluationType.replace(/_/g, " ") : "Challenge"}
+              </span>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-[#1E1E30] border-prop-border shadow-card">
+          <CardContent className="pt-6">
+            <div className="flex flex-col gap-1">
+              <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Payouts</span>
+              <span className="text-lg font-bold text-foreground">
+                {firm.payoutSpeed || "Bi-weekly"}
+              </span>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
-      {/* Verdict / review summary */}
-      <div className="bg-[#1E1E30] rounded-lg border border-[#2E2E45] p-6">
-        <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-          Community Verdict
-        </h2>
-        {avgRating ? (
-          <div className="flex items-center gap-3">
-            <span className="text-3xl font-semibold text-[#00D4AA]">{avgRating}</span>
-            <div>
-              <div className="flex items-center gap-0.5 mb-1">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <span
-                    key={i}
-                    className={
-                      i < Math.round(parseFloat(avgRating))
-                        ? 'text-[#00D4AA]'
-                        : 'text-muted-foreground/30'
-                    }
-                  >
-                    ★
-                  </span>
-                ))}
-              </div>
-              <p className="text-sm text-muted-foreground">
-                Based on {approvedReviews.length} verified{' '}
-                {approvedReviews.length === 1 ? 'review' : 'reviews'}
-              </p>
-            </div>
+      {/* Our Verdict */}
+      <Card className="bg-[#1E1E30] border-prop-border shadow-card relative overflow-hidden">
+        <div className="absolute top-0 left-0 w-1 h-full bg-primary" />
+        <CardHeader>
+          <CardTitle className="text-xl font-bold text-foreground">Our Verdict</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-muted-foreground leading-relaxed text-base">
+            <p>
+              {firm.name} offers a solid balance of rules and scalability. 
+              {firm.profitSplit && firm.profitSplit >= 90 ? " Their generous profit split is an industry standout. " : " "}
+              {firm.newsTrading ? "The allowance of news trading makes them a versatile choice for day traders." : "They maintain strict trading parameters suitable for disciplined traders."}
+            </p>
           </div>
-        ) : (
-          <p className="text-sm text-muted-foreground">
-            No reviews yet. Be the first to share your experience.
-          </p>
-        )}
-      </div>
+        </CardContent>
+      </Card>
     </div>
-  );
+  )
 }
