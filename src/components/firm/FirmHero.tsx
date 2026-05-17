@@ -4,6 +4,7 @@ import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { RuleDifficultyScore } from "./RuleDifficultyScore"
+import { CopyCodeButton } from "./CopyCodeButton"
 import { Firm, FirmOffer } from "@prisma/client"
 import { ExternalLink, Copy } from "lucide-react"
 
@@ -97,11 +98,8 @@ export function FirmHero({ firm }: FirmHeroProps) {
                 </Link>
               </Button>
               
-              {featuredOffer && (
-                <Button variant="outline" size="lg" className="w-full sm:w-auto gap-2 border-prop-border-subtle bg-surface hover:bg-surface-2 hover:text-foreground">
-                  <Copy className="h-4 w-4 text-muted-foreground" />
-                  Copy Code
-                </Button>
+              {featuredOffer && featuredOffer.code && (
+                <CopyCodeButton code={featuredOffer.code} />
               )}
             </div>
             

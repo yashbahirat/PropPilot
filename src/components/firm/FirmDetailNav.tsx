@@ -1,14 +1,25 @@
 "use client"
 
 import React from "react"
-import { Firm } from "@prisma/client"
+import { Firm, FirmOffer, FAQ, Review } from "@prisma/client"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { OverviewTab } from "./tabs/OverviewTab"
 import { ProsConsTab } from "./tabs/ProsConsTab"
+import { RulesTab } from "./tabs/RulesTab"
+import { PricingTab } from "./tabs/PricingTab"
+import { PayoutsTab } from "./tabs/PayoutsTab"
+import { FaqsTab } from "./tabs/FaqsTab"
+import { ReviewsTab } from "./tabs/ReviewsTab"
+
+type FirmWithOffersAndMore = Firm & {
+  offers: FirmOffer[]
+  faqs: FAQ[]
+  reviews: Review[]
+}
 
 interface FirmDetailNavProps {
-  firm: Firm
+  firm: FirmWithOffersAndMore
 }
 
 export function FirmDetailNav({ firm }: FirmDetailNavProps) {
@@ -21,17 +32,17 @@ export function FirmDetailNav({ firm }: FirmDetailNavProps) {
     {
       id: "rules",
       label: "Rules",
-      content: <div className="p-4 text-muted-foreground">Content coming soon</div>
+      content: <RulesTab firm={firm} />
     },
     {
       id: "pricing",
       label: "Pricing",
-      content: <div className="p-4 text-muted-foreground">Content coming soon</div>
+      content: <PricingTab firm={firm} />
     },
     {
       id: "payouts",
       label: "Payouts",
-      content: <div className="p-4 text-muted-foreground">Content coming soon</div>
+      content: <PayoutsTab firm={firm} />
     },
     {
       id: "pros-cons",
@@ -41,12 +52,12 @@ export function FirmDetailNav({ firm }: FirmDetailNavProps) {
     {
       id: "reviews",
       label: "Reviews",
-      content: <div className="p-4 text-muted-foreground">Content coming soon</div>
+      content: <ReviewsTab firm={firm} />
     },
     {
       id: "faqs",
       label: "FAQs",
-      content: <div className="p-4 text-muted-foreground">Content coming soon</div>
+      content: <FaqsTab firm={firm} />
     }
   ]
 

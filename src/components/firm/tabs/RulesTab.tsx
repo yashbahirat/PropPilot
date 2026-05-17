@@ -1,121 +1,97 @@
-import { Prisma, DrawdownType } from '@prisma/client';
+"use client"
 
-type FirmWithRelations = Prisma.FirmGetPayload<{
-  include: {
-    offers: true;
-    reviews: true;
-    faqs: true;
-  };
-}>;
+import React from "react"
+import { Firm } from "@prisma/client"
+import { Card, CardContent } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Check, X, AlertTriangle } from "lucide-react"
 
 interface RulesTabProps {
-  firm: FirmWithRelations;
+  firm: Firm
 }
 
-const DRAWDOWN_LABELS: Record<DrawdownType, { label: string; description: string; severity: 'easy' | 'moderate' | 'hard' | 'very-hard' }> = {
-  BALANCE: { label: 'Balance-Based', description: 'Calculated on account balance only. Most lenient.', severity: 'easy' },
-  EQUITY: { label: 'Equity-Based', description: 'Calculated on current equity including open trades.', severity: 'moderate' },
-  TRAILING_BALANCE: { label: 'Trailing Balance', description: 'Trails your balance as it grows. More restrictive.', severity: 'hard' },
-  TRAILING_EQUITY: { label: 'Trailing Equity', description: 'Trails your highest equity including open positions. Most restrictive.', severity: 'very-hard' },
-};
+export function RulesTab({ firm }: RulesTabProps) {
+  const rules = [
+    { label: "Drawdown Type", value: firm.drawdownType ? firm.drawdownType.replace(/_/g, " ") : "Not specified" },
+    { label: "Max Drawdown", value: firm.maxDrawdown ? `${firm.maxDrawdown}%` : "Not specified" },
+    { label: "Daily Loss Limit", value: firm.dailyLossLimit ? `${firm.dailyLossLimit}%` : "Not specified" },
+    { label: "Minimum Trading Days", value: firm.minTradingDays ? `${firm.minTradingDays} days` : "None" },
+  ]
 
-const SEVERITY_COLORS = {
-  easy: 'text-[#00D4AA] bg-[#00D4AA]/10 border-[#00D4AA]/20',
-  moderate: 'text-yellow-400 bg-yellow-400/10 border-yellow-400/20',
-  hard: 'text-orange-400 bg-orange-400/10 border-orange-400/20',
-  'very-hard': 'text-red-400 bg-red-400/10 border-red-400/20',
-};
-
-function RuleRow({ label, value, positive }: { label: string; value: string; positive?: boolean | null }) {
   return (
-    <div className="flex items-center justify-between gap-4 py-3 border-b border-[#2E2E45] last:border-0">
-      <span className="text-sm font-semibold text-muted-foreground">{label}</span>
-      <div className="flex items-center gap-2">
-        {positive !== null && positive !== undefined && (
-          <span className={`text-xs ${positive ? 'text-[#00D4AA]' : 'text-red-400'}`}>
-            {positive ? '✓' : '✗'}
-          </span>
-        )}
-        <span className="text-sm font-semibold text-white text-right">{value}</span>
+    <div className="flex flex-col gap-6 animate-fade-in">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Key Rules Card */}
+        <Card className="bg-[#1E1E30] border-prop-border shadow-card">
+          <CardContent className="p-6">
+            <h3 className="text-lg font-bold text-foreground mb-6">Trading Parameters</h3>
+            <div className="space-y-4">
+              {rules.map((rule, index) => (
+                <div key={index} className="flex justify-between items-center border-b border-prop-border-subtle pb-3 last:border-0 last:pb-0">
+                  <span className="text-sm font-semibold text-muted-foreground">{rule.label}</span>
+                  <span className="text-sm font-medium text-foreground">{rule.value}</span>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Policy Flags Card */}
+        <Card className="bg-[#1E1E30] border-prop-border shadow-card">
+          <CardContent className="p-6">
+            <h3 className="text-lg font-bold text-foreground mb-6">Trading Policies</h3>
+            <div className="space-y-4">
+              <PolicyRow label="News Trading" isAllowed={firm.newsTrading} />
+              <PolicyRow label="Weekend Holding" isAllowed={firm.weekendHolding} />
+              <PolicyRow label="Expert Advisors (EAs)" isAllowed={firm.eaAllowed} />
+              <PolicyRow label="Scaling Plan" isAllowed={firm.scalingPlan} />
+              
+              <div className="flex justify-between items-center border-b border-prop-border-subtle pb-3 last:border-0 last:pb-0">
+                <span className="text-sm font-semibold text-muted-foreground">Consistency Rule</span>
+                {firm.consistencyRule ? (
+                  <Badge variant="outline" className="bg-amber-500/10 text-amber-500 border-amber-500/20 gap-1">
+                    <AlertTriangle className="w-3 h-3" />
+                    Applies
+                  </Badge>
+                ) : (
+                  <span className="text-sm font-medium flex items-center gap-2 text-green-400">
+                    <Check className="w-4 h-4" /> None
+                  </span>
+                )}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
-    </div>
-  );
-}
 
-export default function RulesTab({ firm }: RulesTabProps) {
-  const drawdownInfo = firm.drawdownType ? DRAWDOWN_LABELS[firm.drawdownType] : null;
-
-  return (
-    <div className="space-y-6">
-      {/* Drawdown Type */}
-      {drawdownInfo && (
-        <div className="bg-[#1E1E30] rounded-lg border border-[#2E2E45] p-6">
-          <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4">
-            Drawdown Structure
-          </h2>
-          <div className="flex items-start gap-3">
-            <span className={`text-xs font-semibold px-2.5 py-1 rounded-md border ${SEVERITY_COLORS[drawdownInfo.severity]}`}>
-              {drawdownInfo.label}
-            </span>
-          </div>
-          <p className="text-sm text-muted-foreground mt-3">{drawdownInfo.description}</p>
-          {firm.maxDrawdown != null && (
-            <p className="text-sm font-semibold text-white mt-2">
-              Max drawdown: <span className="text-[#00D4AA]">{firm.maxDrawdown}%</span>
-            </p>
-          )}
-          {firm.dailyLossLimit != null && (
-            <p className="text-sm font-semibold text-white mt-1">
-              Daily loss limit: <span className="text-[#00D4AA]">{firm.dailyLossLimit}%</span>
-            </p>
-          )}
-        </div>
+      {firm.consistencyRuleNote && (
+        <Card className="bg-amber-500/5 border-amber-500/20 shadow-card">
+          <CardContent className="p-4 flex gap-3">
+            <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
+            <div>
+              <h4 className="text-sm font-bold text-amber-500 mb-1">Consistency Rule Note</h4>
+              <p className="text-sm text-muted-foreground">{firm.consistencyRuleNote}</p>
+            </div>
+          </CardContent>
+        </Card>
       )}
-
-      {/* Trading Rules */}
-      <div className="bg-[#1E1E30] rounded-lg border border-[#2E2E45] p-6">
-        <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4">
-          Trading Rules
-        </h2>
-        <div>
-          <RuleRow label="News Trading" value={firm.newsTrading ? 'Allowed' : 'Not Allowed'} positive={firm.newsTrading} />
-          <RuleRow label="Weekend Holding" value={firm.weekendHolding ? 'Allowed' : 'Not Allowed'} positive={firm.weekendHolding} />
-          <RuleRow label="Expert Advisors (EA)" value={firm.eaAllowed ? 'Allowed' : 'Not Allowed'} positive={firm.eaAllowed} />
-          <RuleRow label="Consistency Rule" value={firm.consistencyRule ? 'Required' : 'Not Required'} positive={!firm.consistencyRule} />
-          {firm.consistencyRuleNote && (
-            <p className="text-xs text-muted-foreground mt-3 italic">
-              Note: {firm.consistencyRuleNote}
-            </p>
-          )}
-        </div>
-      </div>
-
-      {/* Challenge Parameters */}
-      <div className="bg-[#1E1E30] rounded-lg border border-[#2E2E45] p-6">
-        <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4">
-          Challenge Parameters
-        </h2>
-        <div>
-          {firm.profitTarget != null && (
-            <RuleRow label="Profit Target" value={`${firm.profitTarget}%`} />
-          )}
-          {firm.minTradingDays != null && (
-            <RuleRow label="Min Trading Days" value={`${firm.minTradingDays} days`} />
-          )}
-          {firm.scalingPlan && (
-            <RuleRow label="Scaling Plan" value="Available" positive={true} />
-          )}
-          {firm.evaluationType && (
-            <RuleRow label="Evaluation Type" value={firm.evaluationType.replace(/_/g, ' ')} />
-          )}
-          {firm.fundingStyle && (
-            <RuleRow label="Funding Style" value={firm.fundingStyle.replace(/_/g, ' ')} />
-          )}
-          {firm.platforms.length > 0 && (
-            <RuleRow label="Platforms" value={firm.platforms.join(', ')} />
-          )}
-        </div>
-      </div>
     </div>
-  );
+  )
+}
+
+function PolicyRow({ label, isAllowed }: { label: string; isAllowed: boolean }) {
+  return (
+    <div className="flex justify-between items-center border-b border-prop-border-subtle pb-3 last:border-0 last:pb-0">
+      <span className="text-sm font-semibold text-muted-foreground">{label}</span>
+      {isAllowed ? (
+        <span className="text-sm font-medium flex items-center gap-2 text-green-400">
+          <Check className="w-4 h-4" /> Allowed
+        </span>
+      ) : (
+        <span className="text-sm font-medium flex items-center gap-2 text-destructive">
+          <X className="w-4 h-4" /> Not Allowed
+        </span>
+      )}
+    </div>
+  )
 }
