@@ -1,113 +1,64 @@
-'use client';
+"use client"
 
-import {
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
-} from '@/components/ui/hover-card';
-
-export interface RuleDifficultyBreakdown {
-  drawdownType: number;    // 0-100, higher = more lenient
-  consistencyRule: number; // 0-100, higher = more lenient
-  profitTarget: number;    // 0-100, higher = easier target
-  restrictions: number;    // 0-100, higher = fewer restrictions
-}
+import * as React from "react"
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card"
+import { Progress } from "@/components/ui/progress"
 
 interface RuleDifficultyScoreProps {
-  score: number; // 0-100
-  breakdown?: RuleDifficultyBreakdown;
-}
-
-const BREAKDOWN_LABELS: Record<keyof RuleDifficultyBreakdown, string> = {
-  drawdownType: 'Drawdown Type',
-  consistencyRule: 'Consistency Rule',
-  profitTarget: 'Profit Target',
-  restrictions: 'Restrictions',
-};
-
-function getDifficultyLabel(score: number): { label: string; color: string } {
-  if (score >= 75) return { label: 'Easy', color: 'text-[#00D4AA]' };
-  if (score >= 50) return { label: 'Moderate', color: 'text-yellow-400' };
-  if (score >= 25) return { label: 'Hard', color: 'text-orange-400' };
-  return { label: 'Very Hard', color: 'text-red-400' };
-}
-
-export default function RuleDifficultyScore({
-  score,
-  breakdown,
-}: RuleDifficultyScoreProps) {
-  const { label, color } = getDifficultyLabel(score);
-
-  const bar = (
-    <div className="flex items-center gap-3 w-full cursor-help">
-      <div className="flex-1 bg-[#1E1E30] rounded-full h-2 overflow-hidden">
-        <div
-          className="h-full bg-[#00D4AA] rounded-full transition-all duration-700"
-          style={{ width: `${score}%` }}
-        />
-      </div>
-      <span className="text-sm font-semibold text-white tabular-nums whitespace-nowrap">
-        {score}
-        <span className="text-muted-foreground font-normal">/100</span>
-      </span>
-      <span className={`text-xs font-semibold ${color} whitespace-nowrap`}>
-        {label}
-      </span>
-    </div>
-  );
-
-  if (!breakdown) {
-    return (
-      <div className="w-full">
-        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">
-          Rule Difficulty Score
-        </p>
-        {bar}
-      </div>
-    );
+  score: number
+  breakdown: {
+    drawdownType: string
+    consistencyRule: string
+    profitTarget: string
+    restrictions: string
   }
+}
 
+export function RuleDifficultyScore({ score, breakdown }: RuleDifficultyScoreProps) {
   return (
-    <div className="w-full">
-      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">
-        Rule Difficulty Score
-      </p>
-      <HoverCard openDelay={100} closeDelay={100}>
+    <div className="flex flex-col gap-2 w-full max-w-[240px]">
+      <div className="flex justify-between items-center text-sm font-semibold text-foreground">
+        <span>Rule Difficulty</span>
+        <span className="text-primary">{score}/100</span>
+      </div>
+      
+      <HoverCard openDelay={200} closeDelay={100}>
         <HoverCardTrigger asChild>
-          <div className="w-full">{bar}</div>
+          <div className="cursor-help py-1">
+            <Progress value={score} className="h-2.5 w-full bg-secondary" />
+          </div>
         </HoverCardTrigger>
-        <HoverCardContent
-          className="w-64 bg-[#1E1E30] border-[#2E2E45] text-white p-4"
-          side="bottom"
-          align="start"
-        >
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-            Score Breakdown
-          </p>
-          <div className="space-y-2.5">
-            {(Object.entries(breakdown) as [keyof RuleDifficultyBreakdown, number][]).map(
-              ([key, value]) => (
-                <div key={key} className="flex items-center justify-between gap-2">
-                  <span className="text-xs text-muted-foreground">
-                    {BREAKDOWN_LABELS[key]}
-                  </span>
-                  <div className="flex items-center gap-2">
-                    <div className="w-20 bg-[#08080F] rounded-full h-1.5">
-                      <div
-                        className="h-full bg-[#00D4AA] rounded-full"
-                        style={{ width: `${value}%` }}
-                      />
-                    </div>
-                    <span className="text-xs font-semibold text-white tabular-nums w-8 text-right">
-                      {value}
-                    </span>
-                  </div>
-                </div>
-              )
-            )}
+        <HoverCardContent className="w-80 border-prop-border-subtle bg-surface-2" align="start" sideOffset={12}>
+          <div className="flex flex-col gap-4">
+            <div className="space-y-1.5">
+              <h4 className="text-sm font-semibold text-foreground">Score Breakdown</h4>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                A higher score indicates more flexible and trader-friendly rules.
+              </p>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-y-3 gap-x-4 text-sm">
+              <div className="flex flex-col gap-1">
+                <span className="text-muted-foreground text-xs font-medium uppercase tracking-wider">Drawdown</span>
+                <span className="font-semibold text-foreground">{breakdown.drawdownType}</span>
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-muted-foreground text-xs font-medium uppercase tracking-wider">Consistency</span>
+                <span className="font-semibold text-foreground">{breakdown.consistencyRule}</span>
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-muted-foreground text-xs font-medium uppercase tracking-wider">Profit Target</span>
+                <span className="font-semibold text-foreground">{breakdown.profitTarget}</span>
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-muted-foreground text-xs font-medium uppercase tracking-wider">Restrictions</span>
+                <span className="font-semibold text-foreground">{breakdown.restrictions}</span>
+              </div>
+            </div>
           </div>
         </HoverCardContent>
       </HoverCard>
     </div>
-  );
+  )
 }
+// Note: Uses HoverCard instead of Tooltip for richer content layout
