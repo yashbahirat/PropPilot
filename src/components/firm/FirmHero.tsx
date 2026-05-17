@@ -1,156 +1,116 @@
-import Image from 'next/image';
-import Link from 'next/link';
-import { Prisma } from '@prisma/client';
-import RuleDifficultyScore from './RuleDifficultyScore';
-import CopyCodeButton from './CopyCodeButton';
+import React from "react"
+import Image from "next/image"
+import Link from "next/link"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { RuleDifficultyScore } from "./RuleDifficultyScore"
+import { Firm, FirmOffer } from "@prisma/client"
+import { ExternalLink, Copy } from "lucide-react"
 
-// Type for firm with included relations
-type FirmWithRelations = Prisma.FirmGetPayload<{
-  include: {
-    offers: true;
-    reviews: true;
-    faqs: true;
-  };
-}>;
+type FirmWithOffers = Firm & {
+  offers: FirmOffer[]
+}
 
 interface FirmHeroProps {
-  firm: FirmWithRelations;
+  firm: FirmWithOffers
 }
 
-function computeBreakdown(firm: FirmWithRelations) {
-  // Drawdown type score (higher = more lenient)
-  const drawdownMap: Record<string, number> = {
-    BALANCE: 100,
-    EQUITY: 75,
-    TRAILING_BALANCE: 50,
-    TRAILING_EQUITY: 25,
-  };
-  const drawdownType = firm.drawdownType
-    ? (drawdownMap[firm.drawdownType] ?? 50)
-    : 50;
+export function FirmHero({ firm }: FirmHeroProps) {
+  // Find the best or featured offer
+  const featuredOffer = firm.offers.find((o) => o.isActive && o.isExclusive) || firm.offers.find((o) => o.isActive)
 
-  // Consistency rule (no rule = 100, has rule = 30)
-  const consistencyRule = firm.consistencyRule ? 30 : 100;
-
-  // Profit target (lower target = higher score)
-  const profitTarget = firm.profitTarget
-    ? Math.max(0, Math.min(100, Math.round((1 - firm.profitTarget / 20) * 100)))
-    : 50;
-
-  // Restrictions (each negative: no news, no weekend, no EA)
-  let restrictions = 100;
-  if (!firm.newsTrading) restrictions -= 34;
-  if (!firm.weekendHolding) restrictions -= 33;
-  if (!firm.eaAllowed) restrictions -= 33;
-  restrictions = Math.max(0, restrictions);
-
-  return { drawdownType, consistencyRule, profitTarget, restrictions };
-}
-
-export default function FirmHero({ firm }: FirmHeroProps) {
-  const bestOffer = firm.offers[0] ?? null;
-  const score = firm.ruleDifficultyScore ?? 50;
-  const breakdown = computeBreakdown(firm);
+  // Construct score breakdown from firm data
+  const score = firm.ruleDifficultyScore || 0
+  const breakdown = {
+    drawdownType: firm.drawdownType 
+      ? `${firm.drawdownType.replace(/_/g, ' ')} (${firm.maxDrawdown}%)`
+      : "Not specified",
+    consistencyRule: firm.consistencyRule ? "Yes" : "No",
+    profitTarget: firm.profitTarget ? `${firm.profitTarget}%` : "Not specified",
+    restrictions: [
+      firm.newsTrading ? "News Trading Allowed" : "No News Trading",
+      firm.weekendHolding ? "Weekend Holding Allowed" : "No Weekend Holding"
+    ].join(", ")
+  }
 
   return (
-    <section className="relative overflow-hidden">
-      {/* Gradient background */}
-      <div className="absolute inset-0 bg-gradient-to-b from-[#0E0E1A] via-[#0A0A14] to-[#08080F] pointer-events-none" />
-      {/* Subtle radial glow */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(0,212,170,0.06)_0%,transparent_70%)] pointer-events-none" />
+    <section className="relative w-full border-b border-prop-border bg-gradient-to-b from-[#08080F] to-[#1E1E30] pt-12 pb-8 overflow-hidden">
+      {/* Subtle ambient glow behind the hero */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-primary/5 blur-[120px] rounded-full pointer-events-none" />
 
-      <div className="relative z-10 max-w-6xl mx-auto px-6 py-14 md:py-20">
-        <div className="flex flex-col md:flex-row gap-8 md:gap-12 items-start">
-          {/* Logo */}
-          <div className="flex-shrink-0">
-            <div className="w-20 h-20 md:w-24 md:h-24 rounded-xl bg-[#1E1E30] border border-[#2E2E45] flex items-center justify-center overflow-hidden">
+      <div className="container mx-auto px-4 relative z-10">
+        <div className="flex flex-col md:flex-row gap-8 items-start md:items-center justify-between">
+          
+          {/* Left side: Logo, Name, Score */}
+          <div className="flex flex-col md:flex-row gap-6 items-start md:items-center">
+            {/* Logo */}
+            <div className="w-24 h-24 md:w-32 md:h-32 shrink-0 bg-surface rounded-xl border border-prop-border flex items-center justify-center p-4 shadow-card">
               {firm.logoUrl ? (
                 <Image
                   src={firm.logoUrl}
                   alt={`${firm.name} logo`}
-                  width={96}
-                  height={96}
-                  className="object-contain w-full h-full"
-                  priority
+                  width={128}
+                  height={128}
+                  className="w-full h-full object-contain"
                 />
               ) : (
-                <span className="text-2xl font-bold text-[#00D4AA]">
+                <div className="text-2xl font-bold text-muted-foreground">
                   {firm.name.charAt(0)}
-                </span>
+                </div>
               )}
+            </div>
+
+            {/* Firm Details */}
+            <div className="flex flex-col gap-3">
+              <div className="flex items-center gap-3">
+                <h1 className="text-3xl md:text-4xl font-bold text-foreground">
+                  {firm.name}
+                </h1>
+                {firm.isVerified && (
+                  <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20">
+                    Verified
+                  </Badge>
+                )}
+              </div>
+              
+              {featuredOffer && (
+                <div className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                  <span className="inline-block w-2 h-2 rounded-full bg-accent animate-pulse-teal" />
+                  Featured Offer: <span className="text-foreground">{featuredOffer.discountPercent}% OFF</span>
+                </div>
+              )}
+
+              {/* Score Component */}
+              <div className="mt-2">
+                <RuleDifficultyScore score={score} breakdown={breakdown} />
+              </div>
             </div>
           </div>
 
-          {/* Main content */}
-          <div className="flex-1 min-w-0">
-            {/* Header row */}
-            <div className="flex flex-wrap items-start gap-3 mb-4">
-              {bestOffer?.isExclusive && (
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-semibold bg-[#00D4AA]/15 text-[#00D4AA] border border-[#00D4AA]/30">
-                  ★ EXCLUSIVE
-                </span>
-              )}
-              {bestOffer?.discountPercent && (
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-semibold bg-yellow-400/10 text-yellow-400 border border-yellow-400/20">
-                  {bestOffer.discountPercent}% OFF
-                </span>
-              )}
-            </div>
-
-            <h1 className="text-[36px] font-semibold text-white leading-tight mb-2">
-              {firm.name}
-            </h1>
-
-            {firm.description && (
-              <p className="text-base text-muted-foreground mb-6 max-w-2xl leading-relaxed">
-                {firm.description}
-              </p>
-            )}
-
-            {/* Rule Difficulty Score */}
-            <div className="mb-6 max-w-xs">
-              <RuleDifficultyScore score={score} breakdown={breakdown} />
-            </div>
-
-            {/* Discount code chip */}
-            {bestOffer?.code && (
-              <div className="flex items-center gap-2 mb-6">
-                <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                  Discount Code:
-                </span>
-                <span className="font-mono text-sm font-semibold text-[#00D4AA] bg-[#1E1E30] border border-[#2E2E45] rounded-md px-3 py-1 tracking-wider">
-                  {bestOffer.code}
-                </span>
-              </div>
-            )}
-
-            {/* CTA Buttons */}
-            <div className="flex flex-wrap gap-3">
-              <Link
-                href={`/go/${firm.slug}`}
-                className="inline-flex items-center justify-center px-6 py-2.5 rounded-lg bg-[#00D4AA] text-black text-sm font-semibold hover:bg-[#00D4AA]/90 transition-colors"
-              >
-                Visit Site →
-              </Link>
-              {bestOffer?.code && (
-                <CopyCodeButton code={bestOffer.code} />
+          {/* Right side: CTAs */}
+          <div className="flex flex-col items-start md:items-end gap-4 w-full md:w-auto mt-4 md:mt-0">
+            <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+              <Button asChild size="lg" className="w-full sm:w-auto gap-2 bg-primary hover:bg-primary/90 text-primary-foreground shadow-card-hover font-semibold">
+                <Link href={`/go/${firm.slug}`} target="_blank" rel="noopener noreferrer">
+                  Visit Site
+                  <ExternalLink className="h-4 w-4" />
+                </Link>
+              </Button>
+              
+              {featuredOffer && (
+                <Button variant="outline" size="lg" className="w-full sm:w-auto gap-2 border-prop-border-subtle bg-surface hover:bg-surface-2 hover:text-foreground">
+                  <Copy className="h-4 w-4 text-muted-foreground" />
+                  Copy Code
+                </Button>
               )}
             </div>
-
-            {/* Affiliate Disclosure */}
-            <p className="text-xs text-muted-foreground mt-5">
-              PropPilot may earn a commission when you click affiliate links.{' '}
-              <Link
-                href="/legal/affiliate-disclosure"
-                className="underline hover:text-white transition-colors"
-              >
-                Learn more
-              </Link>
-              .
+            
+            <p className="text-xs text-muted-foreground/80 max-w-[280px] text-left md:text-right leading-relaxed">
+              PropPilot may receive a commission if you make a purchase through our links. This does not affect your price or our review process.
             </p>
           </div>
         </div>
       </div>
     </section>
-  );
+  )
 }
