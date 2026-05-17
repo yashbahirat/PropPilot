@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation"
 import { db } from "@/lib/db"
 import { FirmHero } from "@/components/firm/FirmHero"
+import { FirmDetailNav } from "@/components/firm/FirmDetailNav"
 
 interface FirmPageProps {
   params: Promise<{ slug: string }>
@@ -29,7 +30,9 @@ export default async function FirmPage({ params }: FirmPageProps) {
     <main className="flex min-h-screen flex-col bg-[#08080F]">
       <FirmHero firm={firm} />
       
-      {/* TODO: FirmDetailNav */}
+      <div className="container mx-auto px-4 pb-20">
+        <FirmDetailNav firm={firm} />
+      </div>
     </main>
   )
 }
