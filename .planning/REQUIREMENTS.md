@@ -42,14 +42,14 @@
 ### Firm Detail Page
 
 - [x] **FIRM-01**: Firm detail page shows hero summary with logo, rating/score, featured offer, discount code, and CTA buttons
-- [ ] **FIRM-02**: Page includes tabbed sections: Overview, Rules, Pricing, Payouts, Pros & Cons, Reviews, FAQs
+- [x] **FIRM-02**: Page includes tabbed sections: Overview, Rules, Pricing, Payouts, Pros & Cons, Reviews, FAQs
 - [ ] **FIRM-03**: "Copy discount code" interaction with animated confirmation
 - [x] **FIRM-04**: "Visit Site" CTA routes through tracked `/go/[slug]` affiliate redirect route
 - [x] **FIRM-05**: Affiliate disclosure displayed inline on firm detail page
 - [x] **FIRM-06**: Rule Difficulty Score displayed (weighted score: drawdown type, consistency rules, profit target, restrictions)
 - [ ] **FIRM-07**: Reviews section shows user-submitted reviews with ratings
 - [ ] **FIRM-08**: FAQs section with expandable answers
-- [ ] **FIRM-09**: Structured comparison summary and verdict section
+- [x] **FIRM-09**: Structured comparison summary and verdict section
 
 ### Affiliate & Click Tracking
 
