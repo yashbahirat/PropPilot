@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation"
+import { after } from "next/server"
 import { db } from "@/lib/db"
 import { FirmHero } from "@/components/firm/FirmHero"
 import { FirmDetailNav } from "@/components/firm/FirmDetailNav"
@@ -24,6 +25,35 @@ export default async function FirmPage({ params }: FirmPageProps) {
 
   if (!firm) {
     notFound()
+  }
+
+  // Track page view asynchronously — fires after the page response is sent (D-05, D-06)
+  // D-05: Upsert ComparisonStats.pageViews + weekViews with increment: 1
+  // D-06: No bot filtering in Phase 6 — all visits counted
+  const trackPageView = async () => {
+    try {
+      await db.comparisonStats.upsert({
+        where: { firmId: firm.id },
+        update: {
+          pageViews: { increment: 1 },
+          weekViews: { increment: 1 },
+        },
+        create: {
+          firmId: firm.id,
+          pageViews: 1,
+          weekViews: 1,
+        },
+      })
+    } catch {
+      // Silently swallow — tracking must never break page render (D-02)
+    }
+  }
+
+  // after() fires post-response; floating promise as fallback for unsupported runtimes (D-01)
+  try {
+    after(trackPageView)
+  } catch {
+    Promise.resolve().then(trackPageView)
   }
 
   // Serialize Prisma objects (Decimal, Date) for Client Components
