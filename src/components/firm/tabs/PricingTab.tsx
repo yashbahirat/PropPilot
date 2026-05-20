@@ -54,7 +54,7 @@ export function PricingTab({ firm }: PricingTabProps) {
                   </div>
                   
                   {offer.code ? (
-                    <CopyCodeButton code={offer.code} firmId={firm.id} offerId={offer.id} className="w-full" />
+                    <CopyCodeButton code={offer.code} firmId={firm.id} offerId={offer.id} className="w-full border-white/20 hover:bg-primary/10 hover:border-primary/50 hover:text-foreground" />
                   ) : (
                     <Badge variant="outline" className="justify-center py-2 text-muted-foreground">
                       Link Auto-applies
