@@ -4,13 +4,13 @@ milestone: v1.0
 milestone_name: milestone
 current_phase: 06
 status: executing
-last_updated: "2026-05-20T18:43:23.275Z"
+last_updated: "2026-05-20T19:01:41.594Z"
 progress:
   total_phases: 12
   completed_phases: 5
-  total_plans: 38
+  total_plans: 43
   completed_plans: 29
-  percent: 76
+  percent: 67
 ---
 
 # State: PropPilot
@@ -47,7 +47,7 @@ See: .planning/PROJECT.md (updated 2026-05-03)
 
 - Research complete: STACK.md, FEATURES.md, ARCHITECTURE.md, PITFALLS.md, SUMMARY.md
 - **Latest action:** Milestone v1.0 summary generated
-- **Resume file:** .planning/phases/07-user-dashboard-auth-ux/07-UI-SPEC.md
+- **Resume file:** .planning/phases/07-user-dashboard-auth-ux/07-01-auth-ux-PLAN.md
 - Requirements: 73 v1 requirements defined across 14 categories
 - Config: interactive mode, fine granularity, parallel execution, balanced model profile
 - Key pitfall reminders: await all Next.js 15 request APIs, Prisma must use nodejs runtime, UploadThing for file uploads, clerkMiddleware() pattern
