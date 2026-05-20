@@ -2,7 +2,6 @@
 
 import React, { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { m, AnimatePresence } from "framer-motion"
 import { Check, Copy } from "lucide-react"
 import { toast } from "sonner"
 import { logCopyEvent } from "@/app/actions/tracking"
@@ -32,36 +31,22 @@ export function CopyCodeButton({ code, firmId, offerId, className, variant = "ou
   }
 
   return (
-    <Button 
-      variant={variant} 
+    <Button
+      variant={variant}
       className={`relative overflow-hidden w-full sm:w-auto ${className}`}
       onClick={handleCopy}
     >
-      <AnimatePresence mode="wait" initial={false}>
-        {isCopied ? (
-          <m.div
-            key="copied"
-            initial={{ y: 10, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: -10, opacity: 0 }}
-            className="flex items-center gap-2 text-green-400"
-          >
-            <Check className="w-4 h-4" />
-            <span>Copied!</span>
-          </m.div>
-        ) : (
-          <m.div
-            key="copy"
-            initial={{ y: -10, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: 10, opacity: 0 }}
-            className="flex items-center gap-2"
-          >
-            <Copy className="w-4 h-4" />
-            <span>Copy Code</span>
-          </m.div>
-        )}
-      </AnimatePresence>
+      {isCopied ? (
+        <span className="flex items-center gap-2 text-green-400 transition-opacity duration-150">
+          <Check className="w-4 h-4" />
+          <span>Copied!</span>
+        </span>
+      ) : (
+        <span className="flex items-center gap-2 transition-opacity duration-150">
+          <Copy className="w-4 h-4" />
+          <span>Copy Code</span>
+        </span>
+      )}
     </Button>
   )
 }
