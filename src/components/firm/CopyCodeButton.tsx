@@ -37,7 +37,7 @@ export function CopyCodeButton({ code, firmId, offerId, className, variant = "ou
       className={`relative overflow-hidden w-full sm:w-auto ${className}`}
       onClick={handleCopy}
     >
-      <AnimatePresence mode="wait">
+      <AnimatePresence mode="wait" initial={false}>
         {isCopied ? (
           <m.div
             key="copied"
