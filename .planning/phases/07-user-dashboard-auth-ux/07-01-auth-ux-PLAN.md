@@ -43,22 +43,22 @@ Output: Updated sign-in and sign-up pages.
 
 <task type="auto">
   <name>Task 1: Customize SignIn appearance</name>
-  <files>src/app/sign-in/[[...sign-in]]/page.tsx</files>
+  <read_first>src/app/sign-in/[[...sign-in]]/page.tsx</read_first>
   <action>Modify the `appearance` prop of `<SignIn />`. Override `elements.card` to remove the default background/border and add a subtle glow/elevation effect (seamless container per D-05). Map `formFieldInput` to the exact border and focus ring colors of shadcn dark mode (e.g. `focus:ring-[#00D4AA]`). Map `socialButtonsBlockButton` to glassmorphism styles (`bg-[#131320] border-[#1E1E30] hover:bg-[#1A1A2E]`). Refer to D-04 and the UI-SPEC colors.</action>
   <verify>
     <automated>grep -q "elements: {" src/app/sign-in/[[...sign-in]]/page.tsx</automated>
   </verify>
-  <done>SignIn component appearance matches shadcn dark mode seamlessly.</done>
+  <acceptance_criteria>SignIn component appearance matches shadcn dark mode seamlessly.</acceptance_criteria>
 </task>
 
 <task type="auto">
   <name>Task 2: Customize SignUp appearance</name>
-  <files>src/app/sign-up/[[...sign-up]]/page.tsx</files>
+  <read_first>src/app/sign-up/[[...sign-up]]/page.tsx</read_first>
   <action>Apply the exact same `appearance` prop customizations from Task 1 to the `<SignUp />` component, ensuring the same seamless container and input styles.</action>
   <verify>
     <automated>grep -q "elements: {" src/app/sign-up/[[...sign-up]]/page.tsx</automated>
   </verify>
-  <done>SignUp component appearance matches shadcn dark mode seamlessly.</done>
+  <acceptance_criteria>SignUp component appearance matches shadcn dark mode seamlessly.</acceptance_criteria>
 </task>
 
 </tasks>

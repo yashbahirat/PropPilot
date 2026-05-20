@@ -46,22 +46,22 @@ Output: Claims history page and data table.
 
 <task type="auto">
   <name>Task 1: Create ClaimsTable component</name>
-  <files>src/components/dashboard/ClaimsTable.tsx</files>
+  <read_first>src/components/dashboard/ClaimsTable.tsx</read_first>
   <action>Create a shadcn UI `<Table>` component to display `PurchaseClaim` data. Columns should include: Date, Firm Name, Amount Paid, Discount Code, Status. Use a `<Badge>` for the status (PENDING = yellow/neutral, APPROVED = green/teal, REJECTED = red). Display the rejection reason if status is REJECTED.</action>
   <verify>
     <automated>test -f src/components/dashboard/ClaimsTable.tsx</automated>
   </verify>
-  <done>Table component accurately maps claim data and status badges.</done>
+  <acceptance_criteria>Table component accurately maps claim data and status badges.</acceptance_criteria>
 </task>
 
 <task type="auto">
   <name>Task 2: Assemble Claims History Page</name>
-  <files>src/app/(dashboard)/claims/page.tsx</files>
+  <read_first>src/app/(dashboard)/claims/page.tsx</read_first>
   <action>In this Server Component, fetch all `PurchaseClaim` records for the authenticated user, ordered by `createdAt` descending. Include the `firm` relation to display the firm name. Render the `<ClaimsTable />`. Show a helpful empty state if no claims exist.</action>
   <verify>
     <automated>grep -q "db.purchaseClaim.findMany" src/app/(dashboard)/claims/page.tsx</automated>
   </verify>
-  <done>Page successfully queries DB and renders the claims table.</done>
+  <acceptance_criteria>Page successfully queries DB and renders the claims table.</acceptance_criteria>
 </task>
 
 </tasks>

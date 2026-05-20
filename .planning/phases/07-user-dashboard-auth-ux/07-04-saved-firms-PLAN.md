@@ -47,32 +47,32 @@ Output: Saved firms page, firm card component, and Server Actions.
 
 <task type="auto">
   <name>Task 1: Create Saved Firms Server Actions</name>
-  <files>src/app/actions/savedFirms.ts</files>
+  <read_first>src/app/actions/savedFirms.ts</read_first>
   <action>Create Server Actions `toggleSavedFirm(firmId: string)` and `removeSavedFirm(firmId: string)`. They must authenticate the user, query Prisma `SavedFirm` table, toggle/delete the record, and call `revalidatePath` to update the UI.</action>
   <verify>
     <automated>grep -q "revalidatePath" src/app/actions/savedFirms.ts</automated>
   </verify>
-  <done>Server actions successfully manage SavedFirm records.</done>
+  <acceptance_criteria>Server actions successfully manage SavedFirm records.</acceptance_criteria>
 </task>
 
 <task type="auto">
   <name>Task 2: Create SaveFirmButton and SavedFirmCard components</name>
-  <files>src/components/firms/SaveFirmButton.tsx, src/components/dashboard/SavedFirmCard.tsx</files>
+  <read_first>src/components/firms/SaveFirmButton.tsx, src/components/dashboard/SavedFirmCard.tsx</read_first>
   <action>Create `<SaveFirmButton />` (for use on compare/detail pages) that calls `toggleSavedFirm`. Create `<SavedFirmCard />` to display the firm's basic info (logo, name, challenge fee) and include an inline "Remove" button (D-07) that calls `removeSavedFirm`.</action>
   <verify>
     <automated>test -f src/components/dashboard/SavedFirmCard.tsx</automated>
   </verify>
-  <done>UI components for interacting with saved firms are created.</done>
+  <acceptance_criteria>UI components for interacting with saved firms are created.</acceptance_criteria>
 </task>
 
 <task type="auto">
   <name>Task 3: Assemble Saved Firms Page</name>
-  <files>src/app/(dashboard)/saved/page.tsx</files>
+  <read_first>src/app/(dashboard)/saved/page.tsx</read_first>
   <action>In this Server Component, fetch all `SavedFirm` records for the user, including the `firm` relation. Render the results in a grid layout (D-06). If empty, show a specific "No Saved Firms" empty state. Include a prominent bulk "Compare Selected" CTA button (D-08) that links to `/compare?compare=slug1,slug2`.</action>
   <verify>
     <automated>grep -q "db.savedFirm.findMany" src/app/(dashboard)/saved/page.tsx</automated>
   </verify>
-  <done>Saved firms page renders the grid and bulk compare action.</done>
+  <acceptance_criteria>Saved firms page renders the grid and bulk compare action.</acceptance_criteria>
 </task>
 
 </tasks>

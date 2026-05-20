@@ -43,32 +43,32 @@ Output: Dashboard layout structure and navigation components.
 
 <task type="auto">
   <name>Task 1: Create DashboardSidebar component</name>
-  <files>src/components/layout/DashboardSidebar.tsx</files>
+  <read_first>src/components/layout/DashboardSidebar.tsx</read_first>
   <action>Create a new client component `DashboardSidebar`. Use Framer Motion for a collapsible state (`w-64` vs `w-16`). Include navigation links: Profile (`/dashboard`), Claims (`/dashboard/claims`), Rewards (`/dashboard/rewards`), Saved Firms (`/dashboard/saved`). When collapsed, show only Lucide icons (User, FileText, Gift, Bookmark). At the bottom, place the Clerk `<SignOutButton />` (D-02).</action>
   <verify>
     <automated>test -f src/components/layout/DashboardSidebar.tsx</automated>
   </verify>
-  <done>Sidebar component exists with collapsible behavior and Sign Out button.</done>
+  <acceptance_criteria>Sidebar component exists with collapsible behavior and Sign Out button.</acceptance_criteria>
 </task>
 
 <task type="auto">
   <name>Task 2: Integrate sidebar into Dashboard layout</name>
-  <files>src/app/(dashboard)/layout.tsx</files>
+  <read_first>src/app/(dashboard)/layout.tsx</read_first>
   <action>Update the layout to render `<DashboardSidebar />` on desktop (`hidden md:block`). Ensure the main content area adjusts its margin/padding appropriately when the sidebar collapses/expands.</action>
   <verify>
     <automated>grep -q "DashboardSidebar" src/app/(dashboard)/layout.tsx</automated>
   </verify>
-  <done>Sidebar is integrated into the dashboard layout.</done>
+  <acceptance_criteria>Sidebar is integrated into the dashboard layout.</acceptance_criteria>
 </task>
 
 <task type="auto">
   <name>Task 3: Update MobileDrawer with dashboard links</name>
-  <files>src/components/layout/MobileDrawer.tsx</files>
+  <read_first>src/components/layout/MobileDrawer.tsx</read_first>
   <action>Update `MobileDrawer.tsx` to conditionally render dashboard links when `isSignedIn` is true (D-03). The links should map to the same routes as the desktop sidebar. Append them below the main marketing links or replace them entirely in the dashboard context.</action>
   <verify>
     <automated>grep -q "dashboard" src/components/layout/MobileDrawer.tsx</automated>
   </verify>
-  <done>Mobile drawer shows dashboard links for authenticated users.</done>
+  <acceptance_criteria>Mobile drawer shows dashboard links for authenticated users.</acceptance_criteria>
 </task>
 
 </tasks>

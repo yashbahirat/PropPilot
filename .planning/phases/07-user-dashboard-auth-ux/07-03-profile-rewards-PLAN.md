@@ -47,32 +47,32 @@ Output: Dashboard overview page and reward progress components.
 
 <task type="auto">
   <name>Task 1: Create ProfileSummary component</name>
-  <files>src/components/dashboard/ProfileSummary.tsx</files>
+  <read_first>src/components/dashboard/ProfileSummary.tsx</read_first>
   <action>Create a component that displays the user's name, email, and a premium tier badge. Use metallic/gem gradients for the badge (D-10) based on the `RewardTierName` enum (BRONZE, SILVER, GOLD, PLATINUM).</action>
   <verify>
     <automated>test -f src/components/dashboard/ProfileSummary.tsx</automated>
   </verify>
-  <done>Profile summary component handles rendering tier badges correctly.</done>
+  <acceptance_criteria>Profile summary component handles rendering tier badges correctly.</acceptance_criteria>
 </task>
 
 <task type="auto">
   <name>Task 2: Create RewardProgress component</name>
-  <files>src/components/dashboard/RewardProgress.tsx</files>
+  <read_first>src/components/dashboard/RewardProgress.tsx</read_first>
   <action>Create a component that visualizes tier progress. Render a linear progress bar (D-09) showing current points vs. the threshold for the next tier. If the user has 0 points, display a clear "How to earn points" CTA (D-11).</action>
   <verify>
     <automated>test -f src/components/dashboard/RewardProgress.tsx</automated>
   </verify>
-  <done>Reward progress component renders the bar and the 0-points empty state.</done>
+  <acceptance_criteria>Reward progress component renders the bar and the 0-points empty state.</acceptance_criteria>
 </task>
 
 <task type="auto">
   <name>Task 3: Assemble Dashboard Overview Page</name>
-  <files>src/app/(dashboard)/page.tsx</files>
+  <read_first>src/app/(dashboard)/page.tsx</read_first>
   <action>In this Server Component, fetch the `User` and `UserRewardPoints` records for the authenticated Clerk user. Fetch the `RewardTier` thresholds to calculate progress. Render `<ProfileSummary />` and `<RewardProgress />` side-by-side or stacked on mobile. If the user isn't in the DB, gracefully redirect to a generic error or handle syncing if needed (though webhook should handle it).</action>
   <verify>
     <automated>grep -q "db.userRewardPoints.findUnique" src/app/(dashboard)/page.tsx</automated>
   </verify>
-  <done>Dashboard page correctly fetches and passes data to profile and reward components.</done>
+  <acceptance_criteria>Dashboard page correctly fetches and passes data to profile and reward components.</acceptance_criteria>
 </task>
 
 </tasks>
