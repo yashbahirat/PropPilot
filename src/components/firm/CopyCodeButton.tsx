@@ -5,14 +5,17 @@ import { Button } from "@/components/ui/button"
 import { m, AnimatePresence } from "framer-motion"
 import { Check, Copy } from "lucide-react"
 import { toast } from "sonner"
+import { logCopyEvent } from "@/app/actions/tracking"
 
 interface CopyCodeButtonProps {
   code: string
+  firmId: string
+  offerId: string
   className?: string
   variant?: "default" | "outline" | "ghost" | "secondary"
 }
 
-export function CopyCodeButton({ code, className, variant = "outline" }: CopyCodeButtonProps) {
+export function CopyCodeButton({ code, firmId, offerId, className, variant = "outline" }: CopyCodeButtonProps) {
   const [isCopied, setIsCopied] = useState(false)
 
   const handleCopy = async () => {
@@ -21,6 +24,8 @@ export function CopyCodeButton({ code, className, variant = "outline" }: CopyCod
       setIsCopied(true)
       toast.success("Discount code copied to clipboard!")
       setTimeout(() => setIsCopied(false), 2000)
+      // Fire-and-forget: log copy event without blocking UX (D-08)
+      logCopyEvent(firmId, offerId).catch(() => {})
     } catch (err) {
       toast.error("Failed to copy code.")
     }

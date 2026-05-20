@@ -186,7 +186,12 @@ export function FirmHero({ firm }: FirmHeroProps) {
                 </Button>
                 
                 {featuredOffer && featuredOffer.code && (
-                  <CopyCodeButton code={featuredOffer.code} className="w-full h-12 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white font-medium backdrop-blur-md" />
+                  <CopyCodeButton
+                    code={featuredOffer.code}
+                    firmId={firm.id}
+                    offerId={featuredOffer.id}
+                    className="w-full h-12 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white font-medium backdrop-blur-md"
+                  />
                 )}
               </div>
               

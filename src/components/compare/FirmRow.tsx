@@ -187,6 +187,8 @@ export const FirmRow = memo(function FirmRow({
           {firm.bestOffer && (
             <CopyCodeButton
               code={firm.bestOffer.code}
+              firmId={firm.id}
+              offerId={firm.bestOffer.id}
               discountPercent={firm.bestOffer.discountPercent}
               compact
             />

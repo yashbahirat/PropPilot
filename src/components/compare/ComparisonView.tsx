@@ -215,6 +215,8 @@ export function ComparisonView({ firms }: ComparisonViewProps) {
             {firm.bestOffer && (
               <CopyCodeButton
                 code={firm.bestOffer.code}
+                firmId={firm.id}
+                offerId={firm.bestOffer.id}
                 discountPercent={firm.bestOffer.discountPercent}
                 compact
               />

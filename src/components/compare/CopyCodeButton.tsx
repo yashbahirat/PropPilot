@@ -4,9 +4,12 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Copy, Check } from 'lucide-react';
 import { toast } from 'sonner';
+import { logCopyEvent } from '@/app/actions/tracking';
 
 interface CopyCodeButtonProps {
   code: string;
+  firmId: string;
+  offerId: string;
   discountPercent?: number | null;
   compact?: boolean;
 }
@@ -15,8 +18,9 @@ interface CopyCodeButtonProps {
  * Copy discount code to clipboard with sonner toast confirmation.
  * compact=true renders an inline monospace badge (for table rows).
  * compact=false renders a full Button (for cards).
+ * logCopyEvent fired fire-and-forget after clipboard write (D-08).
  */
-export function CopyCodeButton({ code, discountPercent, compact = false }: CopyCodeButtonProps) {
+export function CopyCodeButton({ code, firmId, offerId, discountPercent, compact = false }: CopyCodeButtonProps) {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = async () => {
@@ -28,6 +32,8 @@ export function CopyCodeButton({ code, discountPercent, compact = false }: CopyC
         duration: 3000,
       });
       setTimeout(() => setCopied(false), 2000);
+      // Fire-and-forget: log copy event without blocking UX (D-08)
+      logCopyEvent(firmId, offerId).catch(() => {});
     } catch {
       toast.error('Failed to copy code');
     }
