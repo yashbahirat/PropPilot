@@ -2,21 +2,21 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_phase: 05
+current_phase: 06
 status: executing
-last_updated: "2026-05-17T16:28:10.184Z"
+last_updated: "2026-05-20T15:01:29.032Z"
 progress:
   total_phases: 12
-  completed_phases: 3
+  completed_phases: 5
   total_plans: 38
-  completed_plans: 24
-  percent: 63
+  completed_plans: 29
+  percent: 76
 ---
 
 # State: PropPilot
 
-**Status:** Ready to execute
-**Current Phase:** 05
+**Status:** Executing Phase 06
+**Current Phase:** 06
 **Last Updated:** 2026-05-17
 
 ## Project Reference
@@ -24,7 +24,7 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-03)
 
 **Core value:** Traders can find the best prop firm, claim the best discount, and trust the information is accurate — all in one premium experience.
-**Current focus:** Phase 05 — firm-detail-pages
+**Current focus:** Phase 06 — affiliate-tracking
 
 ## Phase Progress
 
@@ -47,7 +47,7 @@ See: .planning/PROJECT.md (updated 2026-05-03)
 
 - Research complete: STACK.md, FEATURES.md, ARCHITECTURE.md, PITFALLS.md, SUMMARY.md
 - **Latest action:** Milestone v1.0 summary generated
-- **Resume file:** .planning/phases/06-affiliate-tracking/06-CONTEXT.md
+- **Resume file:** .planning/phases/07-user-dashboard-auth-ux/07-CONTEXT.md
 - Requirements: 73 v1 requirements defined across 14 categories
 - Config: interactive mode, fine granularity, parallel execution, balanced model profile
 - Key pitfall reminders: await all Next.js 15 request APIs, Prisma must use nodejs runtime, UploadThing for file uploads, clerkMiddleware() pattern
