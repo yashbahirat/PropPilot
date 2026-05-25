@@ -21,7 +21,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
-import { saveGuide } from "@/app/(admin)/admin/guides/actions"
+import { saveGuide } from "@/app/_(admin)/admin/guides/actions"
 
 
 

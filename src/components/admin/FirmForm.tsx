@@ -22,7 +22,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Switch } from "@/components/ui/switch"
-import { saveFirm } from "@/app/(admin)/admin/firms/actions"
+import { saveFirm } from "@/app/_(admin)/admin/firms/actions"
 import { OfferManagement } from "@/components/admin/OfferManagement"
 
 

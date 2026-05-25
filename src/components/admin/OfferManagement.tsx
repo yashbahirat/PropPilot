@@ -28,7 +28,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { saveOffer, deleteOffer } from "@/app/(admin)/admin/firms/actions"
+import { saveOffer, deleteOffer } from "@/app/_(admin)/admin/firms/actions"
 
 
 type OfferFormValues = z.infer<typeof offerSchema>
